@@ -9,8 +9,12 @@ export function url(lang: Lang, path = ''): string {
   return `${base}${lang === 'en' ? 'en/' : ''}${p}`;
 }
 
-/** 動態路由的 [...lang] 參數：中文是 undefined（根目錄），英文是 'en' */
-export const langParams = [
+/**
+ * 動態路由的 [...lang] 參數：中文是 undefined（根目錄），英文是 'en'。
+ * 每次呼叫都回傳新的陣列：Astro 7 會把比對用的索引掛在回傳的陣列上，
+ * 如果各頁面共用同一個陣列，後面的頁面會拿到前一頁的索引而找不到路徑。
+ */
+export const langParams = () => [
   { params: { lang: undefined }, props: { lang: 'zh' as Lang } },
   { params: { lang: 'en' }, props: { lang: 'en' as Lang } },
 ];

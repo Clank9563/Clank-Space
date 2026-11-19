@@ -190,6 +190,8 @@ html.nb-play .entries .entry > .margin-mark {
   html.nb-play .hero-title s::after,
   html.nb-play .hero-title s,
   html.nb-play .hero-title ins,
-  html.nb-play .entries .entry > * { animation: none; }
+  /* 和上面的開場規則同樣具體，才蓋得過去（> * 比 > :not(.margin-mark) 弱） */
+  html.nb-play .entries .entry > :not(.margin-mark),
+  html.nb-play .entries .entry > .margin-mark { animation: none; }
   .entry .margin-mark::after { transition: none; }
 }

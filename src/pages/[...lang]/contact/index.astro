@@ -3,7 +3,7 @@ import Base from '../../../layouts/Base.astro';
 import { langParams, t, url, type Lang } from '../../../i18n';
 import { site } from '../../../site.config';
 
-export function getStaticPaths() { return langParams; }
+export function getStaticPaths() { return langParams(); }
 const { lang } = Astro.props as { lang: Lang };
 const copy = {
   zh: {

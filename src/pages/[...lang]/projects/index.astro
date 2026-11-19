@@ -4,7 +4,7 @@ import { formatDate, langParams, t, url, type Lang } from '../../../i18n';
 import { entryLabel, getProjects } from '../../../lib/content';
 import { site } from '../../../site.config';
 
-export function getStaticPaths() { return langParams; }
+export function getStaticPaths() { return langParams(); }
 const { lang } = Astro.props as { lang: Lang };
 const projects = await getProjects(lang);
 const lede = lang === 'zh'

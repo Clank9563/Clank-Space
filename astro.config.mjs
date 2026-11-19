@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import { unified } from '@astrojs/markdown-remark';
 import path from 'node:path';
 import sharp from 'sharp';
 
@@ -49,6 +50,8 @@ export default defineConfig({
   site,
   base,
   trailingSlash: 'always',
+  // Astro 7 預設的 'jsx' 壓縮會拿掉標籤之間的空白（例如日期和標記之間），維持 Astro 5 的行為
+  compressHTML: true,
   integrations: [mdx(), sitemap()],
   i18n: {
     defaultLocale: 'zh',
@@ -61,6 +64,7 @@ export default defineConfig({
   },
   markdown: {
     shikiConfig: { theme: 'css-variables', wrap: false },
-    rehypePlugins: [rehypeArticleImages],
+    // Astro 7 預設用 Sätteri 處理 Markdown；圖片外掛是 rehype 外掛，所以改用 unified 處理器
+    processor: unified({ rehypePlugins: [rehypeArticleImages] }),
   },
 });

@@ -6,7 +6,7 @@ import { getPosts, POSTS_PER_PAGE, postsPageCount, postsPagePath } from '../../.
 
 export async function getStaticPaths() {
   const paths = [];
-  for (const { params, props } of langParams) {
+  for (const { params, props } of langParams()) {
     const total = postsPageCount((await getPosts(props.lang)).length);
     for (let n = 2; n <= total; n++) paths.push({ params: { ...params, page: String(n) }, props: { lang: props.lang, page: n } });
   }

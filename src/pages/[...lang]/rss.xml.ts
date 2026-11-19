@@ -4,7 +4,7 @@ import { langParams, url, type Lang } from '../../i18n';
 import { getPosts } from '../../lib/content';
 import { site } from '../../site.config';
 
-export function getStaticPaths() { return langParams; }
+export function getStaticPaths() { return langParams(); }
 
 export async function GET(context: APIContext) {
   const lang = (context.props as { lang: Lang }).lang;

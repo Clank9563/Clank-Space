@@ -2,7 +2,7 @@
 import Base from '../../../layouts/Base.astro';
 import { langParams, t, url, type Lang } from '../../../i18n';
 
-export function getStaticPaths() { return langParams; }
+export function getStaticPaths() { return langParams(); }
 const { lang } = Astro.props as { lang: Lang };
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 const lede = lang === 'zh' ? '搜尋所有文章、專案與單頁。只會搜尋目前語言的內容。' : 'Search every entry, project and page in this language.';

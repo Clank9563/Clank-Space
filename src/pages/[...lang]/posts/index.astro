@@ -3,7 +3,7 @@ import PostIndex from '../../../components/PostIndex.astro';
 import { langParams, t, url, type Lang } from '../../../i18n';
 import { getPosts, POSTS_PER_PAGE, postsPageCount } from '../../../lib/content';
 
-export function getStaticPaths() { return langParams; }
+export function getStaticPaths() { return langParams(); }
 const { lang } = Astro.props as { lang: Lang };
 const posts = await getPosts(lang);
 const lede = lang === 'zh'
