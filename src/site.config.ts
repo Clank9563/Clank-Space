@@ -29,7 +29,7 @@ export const site = {
    * code 留空時不會記錄，網站上也不會顯示次數。
    */
   goatcounter: {
-    code: "",
+    code: "clank9563",
   },
   /** 分類：key 用在網址，label 是顯示名稱 */
   categories: {
