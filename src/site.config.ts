@@ -17,10 +17,10 @@ export const site = {
    * repoId 留空時不會顯示留言區。
    */
   giscus: {
-    repo: "your-account/your-repo",
-    repoId: "",
+    repo: "Clank9563/Clank-Space",
+    repoId: "R_kgDOVzvAuQ",
     category: "Announcements",
-    categoryId: "",
+    categoryId: "DIC_kwDOVzvAuc4DLdxD",
   },
   /**
    * GoatCounter 訪客人次：到 https://www.goatcounter.com 註冊後，把網站代碼填在 code
