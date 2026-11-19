@@ -157,7 +157,8 @@ body,
 ::view-transition-old(nb-pen) { display: none; }
 ::view-transition-new(nb-pen) { animation: none; }
 /* 頁面捲到底時，筆往右下退一點，不擋住簽名列 */
-html.nb-at-end .nb-pen { translate: 60px 40px; }
+/* 往右下多退一些：頁尾連結都在筆尖左側，只退 60px 40px 時筆身仍會壓住「聯絡」欄的 LinkedIn、RSS 連結 */
+html.nb-at-end .nb-pen { translate: 160px 120px; }
 @media (max-width: 1180px) { .nb-pen { width: 220px; right: -40px; bottom: 80px; } }
 @media (max-width: 720px) { .nb-pen { display: none; } }
 @media print { .nb-pen, .nb-body::after { display: none; } }

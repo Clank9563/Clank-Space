@@ -457,6 +457,8 @@ ins { text-decoration: none; }
 /* ───────── 頁尾：簽名欄 ───────── */
 .nb-sign {
   grid-column: 2 / -1;
+  /* 內容比一個畫面短時，頁面高度多出來的部分會分給每一列；頁尾貼齊底部、維持自己的高度，不被拉長 */
+  align-self: end;
   display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   border-top: 2px solid var(--rule);
   background: var(--pad);

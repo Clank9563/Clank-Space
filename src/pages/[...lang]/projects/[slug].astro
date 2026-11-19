@@ -45,8 +45,9 @@ const no = entryLabel(project.no, 'P');
     </div>
   </article>
   <Fragment slot="aside">
-    <Toc lang={lang} headings={headings} />
+    <!-- 返回按鈕放在目次上方：目次會黏在畫面上，放在下方會在捲到底時被目次蓋住 -->
     <a class="btn" href={url(lang, 'projects/')}>← {lang === 'zh' ? '全部專案' : 'All projects'}</a>
+    <Toc lang={lang} headings={headings} />
   </Fragment>
   <CopyCode lang={lang} />
 </Base>
