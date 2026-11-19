@@ -96,7 +96,8 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
           // 讀取公開的訪客次數，填進頁尾與文章資料列
           // 欄位預設隱藏，讀到數字才顯示：被廣告阻擋或連線失敗時整欄不出現，不會留下「—」
           document.querySelectorAll('[data-visits]').forEach(function (el) {
-            var path = el.dataset.visits === 'TOTAL' ? 'TOTAL' : encodeURIComponent(location.pathname);
+            // GoatCounter 記錄的路徑沒有結尾斜線（/Clank-Space/about），查詢時也要拿掉，不然會查不到（404）
+            var path = el.dataset.visits === 'TOTAL' ? 'TOTAL' : encodeURIComponent(location.pathname.replace(/(.)\/$/, '$1'));
             // no-cache：每次都向 GoatCounter 確認，避免瀏覽器一直用存著的舊回應（例如開啟公開設定前的 403）
             fetch('https://' + gc + '.goatcounter.com/counter/' + path + '.json', { cache: 'no-cache' })
               // 404 代表這一頁還沒有紀錄，當成 0
