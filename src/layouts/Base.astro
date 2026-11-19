@@ -99,7 +99,9 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
             // GoatCounter 記錄的路徑沒有結尾斜線（/Clank-Space/about），查詢時也要拿掉，不然會查不到（404）
             var path = el.dataset.visits === 'TOTAL' ? 'TOTAL' : encodeURIComponent(location.pathname.replace(/(.)\/$/, '$1'));
             // no-cache：每次都向 GoatCounter 確認，避免瀏覽器一直用存著的舊回應（例如開啟公開設定前的 403）
-            fetch('https://' + gc + '.goatcounter.com/counter/' + path + '.json', { cache: 'no-cache' })
+            // 加上 start：不帶參數的查詢會被 GoatCounter 快取住開站前的 0 或 404，換一組參數才拿得到實際數字；
+            // 2020-01-01 早於開站，等於「全部期間」
+            fetch('https://' + gc + '.goatcounter.com/counter/' + path + '.json?start=2020-01-01', { cache: 'no-cache' })
               // 404 代表這一頁還沒有紀錄，當成 0
               // GoatCounter 的公開數字會快取最多 4 小時，所以會比後台慢
               .then(function (r) { return r.ok ? r.json() : r.status === 404 ? { count: '0' } : null; })
