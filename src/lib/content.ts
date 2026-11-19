@@ -38,6 +38,11 @@ export async function getPosts(lang: Lang) {
 }
 export type NumberedPost = Awaited<ReturnType<typeof getPosts>>[number];
 
+/** 文章列表每頁幾篇；第 1 頁在 /posts/，之後是 /posts/page/2/、/posts/page/3/… */
+export const POSTS_PER_PAGE = 10;
+export const postsPageCount = (total: number) => Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
+export const postsPagePath = (n: number) => (n === 1 ? 'posts/' : `posts/page/${n}/`);
+
 export async function getProjects(lang: Lang) {
   const all = (await getCollection('projects')).sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
   const keyNo = new Map<string, number>();

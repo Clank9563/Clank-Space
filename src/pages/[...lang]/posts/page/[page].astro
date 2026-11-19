@@ -1,0 +1,25 @@
+---
+// 文章列表第 2 頁之後：/posts/page/2/、/en/posts/page/2/…（第 1 頁在 /posts/）
+import PostIndex from '../../../../components/PostIndex.astro';
+import { langParams, t, url, type Lang } from '../../../../i18n';
+import { getPosts, POSTS_PER_PAGE, postsPageCount, postsPagePath } from '../../../../lib/content';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const { params, props } of langParams) {
+    const total = postsPageCount((await getPosts(props.lang)).length);
+    for (let n = 2; n <= total; n++) paths.push({ params: { ...params, page: String(n) }, props: { lang: props.lang, page: n } });
+  }
+  return paths;
+}
+const { lang, page } = Astro.props as { lang: Lang; page: number };
+const posts = await getPosts(lang);
+const total = postsPageCount(posts.length);
+const lede = lang === 'zh'
+  ? '所有記錄，依日期由新到舊排列。左側邊欄是文章編號，中英文版本共用同一個編號。'
+  : 'Every entry, newest first. The number in the margin is shared by the Chinese and English versions of an entry.';
+// 另一個語言的文章數可能比較少，那邊沒有這一頁時就連到它的最後一頁
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+const otherTotal = postsPageCount((await getPosts(other)).length);
+---
+<PostIndex lang={lang} title={t(lang, 'writing')} lede={lede} posts={posts.slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE)} allPosts={posts} pageNo={`p.010 · ${page}`} pager={{ current: page, total }} altHref={url(other, postsPagePath(Math.min(page, otherTotal)))} />

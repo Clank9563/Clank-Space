@@ -1,7 +1,7 @@
 ---
 import PostIndex from '../../../components/PostIndex.astro';
 import { langParams, t, url, type Lang } from '../../../i18n';
-import { getPosts } from '../../../lib/content';
+import { getPosts, POSTS_PER_PAGE, postsPageCount } from '../../../lib/content';
 
 export function getStaticPaths() { return langParams; }
 const { lang } = Astro.props as { lang: Lang };
@@ -10,4 +10,4 @@ const lede = lang === 'zh'
   ? '所有記錄，依日期由新到舊排列。左側邊欄是文章編號，中英文版本共用同一個編號。'
   : 'Every entry, newest first. The number in the margin is shared by the Chinese and English versions of an entry.';
 ---
-<PostIndex lang={lang} title={t(lang, 'writing')} lede={lede} posts={posts} allPosts={posts} pageNo="p.010" altHref={url(lang === 'zh' ? 'en' : 'zh', 'posts/')} />
+<PostIndex lang={lang} title={t(lang, 'writing')} lede={lede} posts={posts.slice(0, POSTS_PER_PAGE)} allPosts={posts} pageNo="p.010" pager={{ current: 1, total: postsPageCount(posts.length) }} altHref={url(lang === 'zh' ? 'en' : 'zh', 'posts/')} />

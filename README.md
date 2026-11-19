@@ -51,6 +51,26 @@ translationKey: my-post    # 選填：中英文版本用同一個 key 連結
 
 想加旁註，把副檔名改成 `.mdx`，把被說明的段落包起來：`<Sidenote label="註" note="註記內容">被說明的段落</Sidenote>`。寬螢幕時註記會掛在段落右側。
 
+### 放圖片
+
+文章有圖片時，建一個資料夾，把文章改名成 `index.md`，圖片放在旁邊，用相對路徑引用：
+
+```
+src/content/posts/zh/my-post/
+├── index.md          ← 網址還是 /posts/my-post/
+└── screenshot.png
+```
+
+```markdown
+![說明文字](./screenshot.png)
+```
+
+建置時會自動壓縮：轉成 WebP、寬度最多 1400px，並產生 480 / 800 / 1100 / 1400px 幾種尺寸，手機只會下載小張的。原圖比較小時維持原寸。原圖直接放就好，不用先自己壓縮；但原圖會存進 repo，手機照片這種好幾 MB 的檔案，放之前縮小一點可以讓 repo 不會越來越大。
+
+用 `/` 或 `https://` 開頭的圖片網址不會經過壓縮。
+
+文章列表每頁 10 篇，超過時會自動分頁（`/posts/page/2/`…）。要改每頁篇數，修改 `src/lib/content.ts` 的 `POSTS_PER_PAGE`。
+
 ## 部署到 GitHub Pages
 
 1. 把專案推到 GitHub。
