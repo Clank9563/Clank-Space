@@ -79,7 +79,8 @@ body,
   z-index: -1;
   background: var(--sheet);
   border: 1px solid var(--hair);
-  transform: translate(6px, 7px) rotate(0.6deg);
+  /* 只位移不旋轉：旋轉的偏移量會隨文章長度放大，長文底部會歪出版面 */
+  transform: translate(6px, 7px);
   box-shadow: var(--lift);
 }
 
