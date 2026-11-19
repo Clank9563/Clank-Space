@@ -94,14 +94,20 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
         <script is:inline async data-goatcounter={`https://${site.goatcounter.code}.goatcounter.com/count`} src="https://gc.zgo.at/count.js"></script>
         <script is:inline define:vars={{ gc: site.goatcounter.code }}>
           // 讀取公開的訪客次數，填進頁尾與文章資料列
+          // 欄位預設隱藏，讀到數字才顯示：被廣告阻擋或連線失敗時整欄不出現，不會留下「—」
           document.querySelectorAll('[data-visits]').forEach(function (el) {
             var path = el.dataset.visits === 'TOTAL' ? 'TOTAL' : encodeURIComponent(location.pathname);
             // no-cache：每次都向 GoatCounter 確認，避免瀏覽器一直用存著的舊回應（例如開啟公開設定前的 403）
             fetch('https://' + gc + '.goatcounter.com/counter/' + path + '.json', { cache: 'no-cache' })
-              // 404 代表這一頁還沒有紀錄，當成 0；被擋掉或連線失敗時才維持「—」
+              // 404 代表這一頁還沒有紀錄，當成 0
               // GoatCounter 的公開數字會快取最多 4 小時，所以會比後台慢
               .then(function (r) { return r.ok ? r.json() : r.status === 404 ? { count: '0' } : null; })
-              .then(function (d) { if (d && d.count) el.textContent = d.count + (el.dataset.suffix || ''); })
+              .then(function (d) {
+                if (!d || !d.count) return;
+                el.textContent = d.count + (el.dataset.suffix || '');
+                var field = el.closest('[data-visits-field]');
+                if (field) field.hidden = false;
+              })
               .catch(function () {});
           });
         </script>

@@ -34,7 +34,7 @@ const no = entryLabel(essay.no, 'S');
         {essay.data.topic && <div><dt class="field-label">{t(lang, 'topic')}</dt><dd>{essay.data.topic}</dd></div>}
         <div><dt class="field-label">{t(lang, 'readingTime')}</dt><dd>{`${readingMinutes(essay.body)} ${t(lang, 'minutes')}`}</dd></div>
         {site.goatcounter.code && (
-          <div><dt class="field-label">{t(lang, 'reads')}</dt><dd><span data-visits="PAGE" data-suffix={t(lang, 'timesSuffix')}>—</span></dd></div>
+          <div data-visits-field hidden><dt class="field-label">{t(lang, 'reads')}</dt><dd><span data-visits="PAGE" data-suffix={t(lang, 'timesSuffix')}>—</span></dd></div>
         )}
       </dl>
       {!translated && <p class="visually-hidden">{t(lang, 'noTranslation')}</p>}

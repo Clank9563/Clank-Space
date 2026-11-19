@@ -14,7 +14,7 @@ const { lang, lastRevised } = Astro.props;
     <strong>{lastRevised ? <time datetime={lastRevised.toISOString()}>{formatDate(lastRevised, lang)}</time> : `© ${new Date().getFullYear()} ${site.name[lang]}`}</strong>
   </div>
   {site.goatcounter.code && (
-    <div>
+    <div data-visits-field hidden>
       <span class="field-label">{t(lang, 'pageTurns')}</span>
       <strong><span data-visits="TOTAL" data-suffix={t(lang, 'timesSuffix')}>—</span></strong>
     </div>

@@ -55,7 +55,7 @@ const revisions = [...post.data.revisions].sort((a, b) => b.date.valueOf() - a.d
         <div><dt class="field-label">{t(lang, 'category')}</dt><dd><a href={url(lang, `categories/${post.data.category}/`)}>{category}</a></dd></div>
         <div><dt class="field-label">{t(lang, 'readingTime')}</dt><dd>{`${minutes} ${t(lang, 'minutes')}`}</dd></div>
         {site.goatcounter.code && (
-          <div><dt class="field-label">{t(lang, 'reads')}</dt><dd><span data-visits="PAGE" data-suffix={t(lang, 'timesSuffix')}>—</span></dd></div>
+          <div data-visits-field hidden><dt class="field-label">{t(lang, 'reads')}</dt><dd><span data-visits="PAGE" data-suffix={t(lang, 'timesSuffix')}>—</span></dd></div>
         )}
       </dl>
       {post.data.outdated && <p class="callout">{t(lang, 'outdated')}</p>}
