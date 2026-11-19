@@ -67,4 +67,17 @@ export default defineConfig({
     // Astro 7 預設用 Sätteri 處理 Markdown；圖片外掛是 rehype 外掛，所以改用 unified 處理器
     processor: unified({ rehypePlugins: [rehypeArticleImages] }),
   },
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          // CSS 用固定檔名（不帶 hash）：GitHub Pages 會讓瀏覽器快取 HTML 10 分鐘，
+          // 部署後快取裡的舊 HTML 還指向上一版的 CSS 檔名，那個檔已經被刪掉，整頁就會變成沒有樣式。
+          // GitHub Pages 本來就只快取 10 分鐘、不會長期快取，所以 hash 帶來的好處很小。
+          assetFileNames: (info) =>
+            (info.names ?? [info.name]).some((n) => n?.endsWith('.css')) ? '_astro/[name][extname]' : '_astro/[name].[hash][extname]',
+        },
+      },
+    },
+  },
 });

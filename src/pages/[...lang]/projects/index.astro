@@ -8,8 +8,8 @@ export function getStaticPaths() { return langParams(); }
 const { lang } = Astro.props as { lang: Lang };
 const projects = await getProjects(lang);
 const lede = lang === 'zh'
-  ? '做過的專案。每一件都寫下做了什麼、為什麼這樣做，以及我負責的部分。'
-  : 'Things I have built: what each one does, why it was built that way, and which part was mine.';
+  ? '這裡整理過去參與的專案，記錄每個專案的實作內容、設計考量，以及我實際負責的部分。'
+  : 'A collection of projects I have worked on, documenting what I built, why I made certain decisions, and the parts I was responsible for.';
 ---
 <Base lang={lang} title={t(lang, 'projects')} description={lede} pageNo="p.020" section="projects" altHref={url(lang === 'zh' ? 'en' : 'zh', 'projects/')}>
   <h1 class="page-title">{t(lang, 'projects')}{site.placeholder && <span class="sample-tag">{t(lang, 'sample')}</span>}</h1>
