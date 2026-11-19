@@ -96,8 +96,10 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
             var path = el.dataset.visits === 'TOTAL' ? 'TOTAL' : encodeURIComponent(location.pathname);
             // no-cache：每次都向 GoatCounter 確認，避免瀏覽器一直用存著的舊回應（例如開啟公開設定前的 403）
             fetch('https://' + gc + '.goatcounter.com/counter/' + path + '.json', { cache: 'no-cache' })
-              .then(function (r) { return r.ok ? r.json() : null; })
-              .then(function (d) { el.textContent = d && d.count ? d.count + (el.dataset.suffix || '') : '—'; })
+              // 404 代表這一頁還沒有紀錄，當成 0；被擋掉或連線失敗時才維持「—」
+              // GoatCounter 的公開數字會快取最多 4 小時，所以會比後台慢
+              .then(function (r) { return r.ok ? r.json() : r.status === 404 ? { count: '0' } : null; })
+              .then(function (d) { if (d && d.count) el.textContent = d.count + (el.dataset.suffix || ''); })
               .catch(function () {});
           });
         </script>
