@@ -1,0 +1,54 @@
+---
+// 文章列表、分類頁、標籤頁共用的版面
+import Base from '../layouts/Base.astro';
+import EntryList from './EntryList.astro';
+import { t, url, type Lang } from '../i18n';
+import { tagSlug, type NumberedPost } from '../lib/content';
+import { site } from '../site.config';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  lede: string;
+  posts: NumberedPost[];
+  allPosts: NumberedPost[];
+  pageNo: string;
+  currentCategory?: string;
+  currentTag?: string;
+  altHref: string;
+}
+const { lang, title, lede, posts, allPosts, pageNo, currentCategory, currentTag, altHref } = Astro.props;
+
+const tagCounts = new Map<string, { label: string; n: number }>();
+for (const p of allPosts) for (const tag of p.data.tags) {
+  const k = tagSlug(tag);
+  tagCounts.set(k, { label: tag, n: (tagCounts.get(k)?.n ?? 0) + 1 });
+}
+const tags = [...tagCounts.entries()].sort((a, b) => b[1].n - a[1].n);
+---
+<Base lang={lang} title={title} description={lede} pageNo={pageNo} section="writing" altHref={altHref}>
+  <h1 class="page-title">{title}{site.placeholder && <span class="sample-tag">{t(lang, 'sample')}</span>}</h1>
+  <p class="page-lede">{lede}</p>
+  <ul class="filter" aria-label={t(lang, 'categories')}>
+    <li><a href={url(lang, 'posts/')} aria-current={!currentCategory && !currentTag ? 'page' : undefined}>{lang === 'zh' ? '全部' : 'All'}<span>{allPosts.length}</span></a></li>
+    {Object.entries(site.categories).map(([key, label]) => {
+      const n = allPosts.filter((p) => p.data.category === key).length;
+      return n > 0 && (
+        <li><a href={url(lang, `categories/${key}/`)} aria-current={currentCategory === key ? 'page' : undefined}>{label[lang]}<span>{n}</span></a></li>
+      );
+    })}
+  </ul>
+  <div class="section-head"><h2>{posts.length} {t(lang, 'entries')}</h2><a href={url(lang, 'rss.xml')}>{t(lang, 'rss')}</a></div>
+  <EntryList lang={lang} posts={posts} showDesc />
+
+  <Fragment slot="aside">
+    <section class="note">
+      <h2>{t(lang, 'tags')}</h2>
+      <ul class="tags">
+        {tags.map(([slug, { label, n }]) => (
+          <li><a href={url(lang, `tags/${slug}/`)} aria-current={currentTag === slug ? 'page' : undefined}>{label}</a> <span class="entry-meta">{n}</span></li>
+        ))}
+      </ul>
+    </section>
+  </Fragment>
+</Base>

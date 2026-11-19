@@ -1,0 +1,25 @@
+---
+import PostIndex from '../../../components/PostIndex.astro';
+import { langs, t, url, type Lang } from '../../../i18n';
+import { getPosts, tagSlug } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of langs) {
+    const posts = await getPosts(lang);
+    const tags = new Map<string, string>();
+    for (const p of posts) for (const tag of p.data.tags) tags.set(tagSlug(tag), tag);
+    for (const [tag, label] of tags) {
+      paths.push({ params: { lang: lang === 'zh' ? undefined : 'en', tag }, props: { lang, label } });
+    }
+  }
+  return paths;
+}
+const { lang, label } = Astro.props as { lang: Lang; label: string };
+const tag = Astro.params.tag!;
+const all = await getPosts(lang);
+const posts = all.filter((p) => p.data.tags.some((x) => tagSlug(x) === tag));
+const lede = lang === 'zh' ? `標有「${label}」的記錄。` : `Entries ${t(lang, 'taggedWith').toLowerCase()} “${label}”.`;
+// 另一個語言不一定有同名標籤，切換時回到文章列表
+---
+<PostIndex lang={lang} title={`#${label}`} lede={lede} posts={posts} allPosts={all} pageNo={`p.010 / #${tag}`} currentTag={tag} altHref={url(lang === 'zh' ? 'en' : 'zh', 'posts/')} />

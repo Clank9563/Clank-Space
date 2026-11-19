@@ -1,0 +1,30 @@
+---
+import { site } from '../site.config';
+import { formatDate, t, url, type Lang } from '../i18n';
+interface Props { lang: Lang; lastRevised?: Date }
+const { lang, lastRevised } = Astro.props;
+---
+<footer class="nb-sign">
+  <div>
+    <span class="field-label">{t(lang, 'recordedBy')}</span>
+    <strong>{site.name[lang]} · {site.role[lang]}</strong>
+  </div>
+  <div>
+    <span class="field-label">{t(lang, lastRevised ? 'lastRevised' : 'copyright')}</span>
+    <strong>{lastRevised ? <time datetime={lastRevised.toISOString()}>{formatDate(lastRevised, lang)}</time> : `© ${new Date().getFullYear()} ${site.name[lang]}`}</strong>
+  </div>
+  {site.goatcounter.code && (
+    <div>
+      <span class="field-label">{t(lang, 'pageTurns')}</span>
+      <strong><span data-visits="TOTAL" data-suffix={t(lang, 'timesSuffix')}>—</span></strong>
+    </div>
+  )}
+  <div>
+    <span class="field-label">{t(lang, 'contact')}</span>
+    <ul>
+      <li><a href={`mailto:${site.email}`}>Email</a></li>
+      {site.socials.map((s) => <li><a href={s.href} rel="me">{s.label}</a></li>)}
+      <li><a href={url(lang, 'rss.xml')}>RSS</a></li>
+    </ul>
+  </div>
+</footer>

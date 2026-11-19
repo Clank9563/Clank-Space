@@ -1,0 +1,127 @@
+---
+import '@fontsource-variable/schibsted-grotesk';
+import '@fontsource-variable/jetbrains-mono';
+import '@fontsource/noto-sans-tc/400.css';
+import '@fontsource/noto-sans-tc/500.css';
+import '@fontsource/noto-sans-tc/700.css';
+import '../styles/global.css';
+import '../styles/motion.css';
+import '../styles/paper.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Pen from '../components/Pen.astro';
+import { htmlLang, url, t, type Lang } from '../i18n';
+import { site } from '../site.config';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description: string;
+  /** 頁首「冊 / 頁」欄位顯示的頁碼 */
+  pageNo: string;
+  /** 目前所在的導覽區塊 */
+  section?: 'home' | 'writing' | 'projects' | 'about' | 'now' | 'uses' | 'contact' | 'search';
+  /** 另一個語言的對應網址 */
+  altHref: string;
+  /** 沒有便條欄的頁面 */
+  wide?: boolean;
+  lastRevised?: Date;
+  type?: 'website' | 'article';
+}
+const { lang, title, description, pageNo, section, altHref, wide = false, lastRevised, type = 'website' } = Astro.props;
+const name = site.name[lang];
+const fullTitle = title ? `${title} · ${name}` : `${name} · ${site.role[lang]}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+<!doctype html>
+<html lang={htmlLang[lang]} data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={htmlLang[other]} href={new URL(altHref, Astro.site)} />
+    <link rel="alternate" type="application/rss+xml" title={`${name} RSS`} href={url(lang, 'rss.xml')} />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <link rel="sitemap" href={`${base}sitemap-index.xml`} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="theme-color" content="#e4eedc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121a15" media="(prefers-color-scheme: dark)" />
+    <!-- 換頁的紙張捲曲（WebGL）；也負責標記「上一頁」的翻頁方向。不支援時退回 CSS 翻頁 -->
+    <script is:inline src={`${base}page-curl.js`}></script>
+    <!-- 翻頁完後，筆把新頁的標題寫出來 -->
+    <script is:inline src={`${base}pen-write.js`}></script>
+    <script is:inline>
+      // 在畫面繪製前套用深淺色，避免閃爍
+      (function () {
+        var stored = null;
+        try { stored = localStorage.getItem('theme'); } catch (e) {}
+        var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        // 開場動畫（標題劃改、列表寫入）每頁每個工作階段只播一次
+        try {
+          var key = 'nb-played:' + location.pathname;
+          if (!sessionStorage.getItem(key)) {
+            document.documentElement.classList.add('nb-play');
+            sessionStorage.setItem(key, '1');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">{t(lang, 'skip')}</a>
+    <Header lang={lang} pageNo={pageNo} section={section} altHref={altHref} />
+    <div class:list={['nb-body', { wide }]}>
+      {type === 'article' && <div class="nb-progress" aria-hidden="true"></div>}
+      <main id="main" class="nb-main">
+        <slot />
+      </main>
+      {!wide && <aside class:list={['nb-aside', { 'is-article': type === 'article' }]}><slot name="aside" /></aside>}
+      <Footer lang={lang} lastRevised={lastRevised} />
+    </div>
+    <Pen />
+    {site.goatcounter.code && (
+      <>
+        <script is:inline async data-goatcounter={`https://${site.goatcounter.code}.goatcounter.com/count`} src="https://gc.zgo.at/count.js"></script>
+        <script is:inline define:vars={{ gc: site.goatcounter.code }}>
+          // 讀取公開的訪客次數，填進頁尾與文章資料列
+          document.querySelectorAll('[data-visits]').forEach(function (el) {
+            var path = el.dataset.visits === 'TOTAL' ? 'TOTAL' : encodeURIComponent(location.pathname);
+            fetch('https://' + gc + '.goatcounter.com/counter/' + path + '.json')
+              .then(function (r) { return r.ok ? r.json() : null; })
+              .then(function (d) { el.textContent = d && d.count ? d.count + (el.dataset.suffix || '') : '—'; })
+              .catch(function () {});
+          });
+        </script>
+      </>
+    )}
+    <script>
+      const root = document.documentElement;
+      const btn = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+      const sync = () => btn?.setAttribute('aria-pressed', String(root.dataset.theme === 'dark'));
+      sync();
+      btn?.addEventListener('click', () => {
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        try { localStorage.setItem('theme', next); } catch {}
+        sync();
+        document.dispatchEvent(new CustomEvent('themechange', { detail: next }));
+      });
+      matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        let stored = null;
+        try { stored = localStorage.getItem('theme'); } catch {}
+        if (stored) return;
+        root.dataset.theme = e.matches ? 'dark' : 'light';
+        sync();
+        document.dispatchEvent(new CustomEvent('themechange', { detail: root.dataset.theme }));
+      });
+    </script>
+  </body>
+</html>

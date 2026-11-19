@@ -1,0 +1,58 @@
+---
+import { site } from '../site.config';
+import { t, type Lang } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const g = site.giscus;
+const enabled = Boolean(g.repoId && g.categoryId);
+---
+<section class="comments" aria-labelledby="comments-title">
+  <h2 id="comments-title">{t(lang, 'comments')}</h2>
+  {enabled ? (
+    <div
+      id="giscus"
+      data-repo={g.repo}
+      data-repo-id={g.repoId}
+      data-category={g.category}
+      data-category-id={g.categoryId}
+      data-lang={lang === 'zh' ? 'zh-TW' : 'en'}
+    ></div>
+  ) : (
+    <p class="setup-note">
+      {lang === 'zh'
+        ? '留言區尚未啟用：在 src/site.config.ts 的 giscus 填入 repoId 與 categoryId 後，這裡會出現 Giscus 留言。'
+        : 'Comments are not set up yet: fill in giscus.repoId and giscus.categoryId in src/site.config.ts to enable Giscus here.'}
+    </p>
+  )}
+</section>
+<script>
+  const box = document.getElementById('giscus');
+  if (box) {
+    const theme = () => (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+    const s = document.createElement('script');
+    s.src = 'https://giscus.app/client.js';
+    s.async = true;
+    s.crossOrigin = 'anonymous';
+    const attrs: Record<string, string> = {
+      'data-repo': box.dataset.repo!,
+      'data-repo-id': box.dataset.repoId!,
+      'data-category': box.dataset.category!,
+      'data-category-id': box.dataset.categoryId!,
+      'data-mapping': 'pathname',
+      'data-strict': '1',
+      'data-reactions-enabled': '1',
+      'data-emit-metadata': '0',
+      'data-input-position': 'bottom',
+      'data-theme': theme(),
+      'data-lang': box.dataset.lang!,
+      'data-loading': 'lazy',
+    };
+    for (const [k, v] of Object.entries(attrs)) s.setAttribute(k, v);
+    box.appendChild(s);
+    // 切換深淺色時同步留言區主題
+    document.addEventListener('themechange', () => {
+      const frame = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+      frame?.contentWindow?.postMessage({ giscus: { setConfig: { theme: theme() } } }, 'https://giscus.app');
+    });
+  }
+</script>

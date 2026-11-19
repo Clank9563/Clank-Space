@@ -1,0 +1,195 @@
+/* ───────── 動態：全部跟筆記本這個世界有關 ─────────
+   1. 換頁像翻筆記本（跨頁 View Transitions，不支援的瀏覽器直接換頁）
+   2. 頁首「冊 / 頁」頁碼像計數器一樣翻到新頁碼
+   3. 首頁標題：紅筆現場劃掉「沒做錯」，再寫上新的字
+   4. 文章頁：紅色邊線被墨水描粗，標示讀到哪裡
+   5. 記錄列表：第一次出現時一列一列寫上去；滑過時邊欄編號被原子筆畫底線
+   開場類動畫只在 html.nb-play 時播放（每頁每個工作階段一次），
+   沒有這個 class 時就是動畫播完的狀態，所以腳本失敗也不會藏住內容。 */
+
+/* ── 1 + 2：翻頁轉場 ── */
+@view-transition { navigation: auto; }
+
+.nb-header { view-transition-name: nb-header; }
+.nb-page strong { view-transition-name: nb-page-no; }
+.nb-body { view-transition-name: nb-sheet; } /* 頁首以下整張紙（含紅色邊線、便條、簽名列）當成一頁 */
+
+/* 整頁快照不動，只有命名的區塊有動作 */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; }
+::view-transition-group(nb-header) { animation: none; z-index: 10; } /* 頁首永遠在翻起的紙上面 */
+
+/* 翻頁：舊的一頁以左側裝訂邊為軸翻起，露出底下的新頁；翻得越高越暗（光線被頁面擋住）。
+   按「上一頁」時反過來：前一頁從左邊翻回來蓋上。 */
+::view-transition-group(nb-sheet) { animation-duration: 0s; }
+::view-transition-image-pair(nb-sheet) { perspective: 3800px; perspective-origin: 35% 40%; }
+
+/* 翻起的那一頁：先掀角（右側抬起、微微扭轉、靠近讀者），再加速翻過，最後在陰影中離開。
+   drop-shadow 是翻起的紙投在底下新頁上的影子，隨紙抬高而變大變淡。 */
+::view-transition-old(nb-sheet) {
+  z-index: 2;
+  transform-origin: left 45%;
+  backface-visibility: hidden;
+  animation: nb-turn-away 1200ms linear both;
+}
+::view-transition-new(nb-sheet) {
+  z-index: 1;
+  animation: nb-under 1200ms linear both;
+}
+@keyframes nb-turn-away {
+  0% {
+    transform: translateZ(0) rotateY(0deg) rotateX(0deg) rotateZ(0deg);
+    filter: brightness(1) drop-shadow(0 0 0 rgba(20, 30, 22, 0));
+    animation-timing-function: cubic-bezier(0.3, 0, 0.6, 1);
+  }
+  22% { /* 掀角：右側抬起、微微扭轉 */
+    transform: translateZ(18px) rotateY(-14deg) rotateX(2.5deg) rotateZ(-0.8deg);
+    filter: brightness(1.03) drop-shadow(-14px 10px 14px rgba(20, 30, 22, 0.28));
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  60% { /* 翻到一半：紙最靠近讀者，影子最大 */
+    transform: translateZ(36px) rotateY(-62deg) rotateX(1.2deg) rotateZ(-0.3deg);
+    filter: brightness(0.9) drop-shadow(-30px 18px 26px rgba(20, 30, 22, 0.22));
+    animation-timing-function: cubic-bezier(0.4, 0, 0.7, 0.4);
+  }
+  100% {
+    transform: translateZ(20px) rotateY(-104deg) rotateX(0deg) rotateZ(0deg);
+    filter: brightness(0.62) drop-shadow(-40px 22px 34px rgba(20, 30, 22, 0.08));
+  }
+}
+/* 底下的新頁：一開始被翻起的紙遮住光線，隨著紙翻走慢慢亮起來 */
+@keyframes nb-under {
+  0%   { filter: brightness(0.8); animation-timing-function: ease-in; }
+  45%  { filter: brightness(0.88); animation-timing-function: ease-out; }
+  100% { filter: brightness(1); }
+}
+
+/* 上一頁：前一頁從左邊翻回來，最後輕輕落在本子上 */
+html:active-view-transition-type(back)::view-transition-old(nb-sheet) {
+  z-index: 1; transform-origin: center; animation: nb-under-out 1200ms linear both;
+}
+html:active-view-transition-type(back)::view-transition-new(nb-sheet) {
+  z-index: 2; transform-origin: left 45%; backface-visibility: hidden;
+  animation: nb-turn-back 1200ms linear both;
+}
+@keyframes nb-turn-back {
+  0% {
+    transform: translateZ(20px) rotateY(-104deg);
+    filter: brightness(0.62) drop-shadow(-40px 22px 34px rgba(20, 30, 22, 0.08));
+    animation-timing-function: cubic-bezier(0.3, 0.6, 0.6, 1);
+  }
+  45% {
+    transform: translateZ(36px) rotateY(-55deg) rotateX(1.2deg) rotateZ(-0.3deg);
+    filter: brightness(0.92) drop-shadow(-26px 18px 26px rgba(20, 30, 22, 0.22));
+    animation-timing-function: cubic-bezier(0.3, 0, 0.5, 1);
+  }
+  85% { /* 落下前稍微停一下 */
+    transform: translateZ(14px) rotateY(-5deg) rotateX(1.5deg) rotateZ(-0.4deg);
+    filter: brightness(1.02) drop-shadow(-8px 6px 10px rgba(20, 30, 22, 0.25));
+    animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
+  }
+  100% {
+    transform: translateZ(0) rotateY(0deg);
+    filter: brightness(1) drop-shadow(0 0 0 rgba(20, 30, 22, 0));
+  }
+}
+@keyframes nb-under-out {
+  0%   { filter: brightness(1); }
+  100% { filter: brightness(0.82); }
+}
+
+/* WebGL 紙張捲曲（page-curl.js 加上 curl 類型時）：截圖不轉動，改由腳本沿摺線裁切，
+   捲起的紙與影子畫在 .nb-curl 畫布上，畫布在頁首之下、紙張之上 */
+html:active-view-transition-type(curl)::view-transition-old(nb-sheet),
+html:active-view-transition-type(curl)::view-transition-new(nb-sheet) { animation: none; transform: none; filter: none; }
+.nb-curl { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9; view-transition-name: nb-curl; }
+::view-transition-group(nb-curl) { z-index: 9; animation: none; }
+::view-transition-old(nb-curl) { display: none; }
+::view-transition-new(nb-curl) { animation: none; }
+
+/* 頁碼計數器：在翻頁進行到一半時，舊頁碼往上翻走、新頁碼從下方翻上來 */
+::view-transition-group(nb-page-no) { overflow: clip; animation-duration: 0s; z-index: 11; }
+::view-transition-old(nb-page-no) { animation: nb-roll-out 380ms cubic-bezier(0.4, 0, 1, 1) 380ms both; }
+::view-transition-new(nb-page-no) { animation: nb-roll-in 620ms cubic-bezier(0.16, 1, 0.3, 1) 600ms both; }
+@keyframes nb-roll-out { to { transform: translateY(-100%); opacity: 0; } }
+@keyframes nb-roll-in { from { transform: translateY(100%); opacity: 0; } }
+
+/* ── 3：首頁標題現場劃改 ── */
+.hero-title s {
+  position: relative;
+  text-decoration: none;
+}
+.hero-title s::after {
+  content: '';
+  position: absolute; left: -0.04em; right: -0.04em; top: 54%;
+  height: 0.09em; background: var(--red);
+  transform: rotate(-1.2deg); transform-origin: left center;
+}
+.hero-title ins { display: inline-block; }
+html.nb-play .hero-title s::after {
+  animation: nb-strike 900ms cubic-bezier(0.65, 0, 0.35, 1) 600ms backwards;
+}
+html.nb-play .hero-title s { animation: nb-dim 500ms linear 1400ms backwards; }
+html.nb-play .hero-title ins {
+  animation: nb-write 1300ms cubic-bezier(0.45, 0.05, 0.4, 1) 1650ms backwards;
+}
+@keyframes nb-strike { from { transform: rotate(-1.2deg) scaleX(0); } to { transform: rotate(-1.2deg) scaleX(1); } }
+@keyframes nb-dim { from { color: var(--ink); } to { color: var(--ink-2); } }
+@keyframes nb-write { from { clip-path: inset(-0.2em 100% -0.3em 0); } to { clip-path: inset(-0.2em 0 -0.3em 0); } }
+
+
+/* ── 4：紅色邊線變閱讀進度（只在文章頁，支援 scroll-driven animation 的瀏覽器） ── */
+.nb-progress { display: none; }
+@supports (animation-timeline: scroll()) {
+  .nb-progress {
+    display: block;
+    position: absolute; top: 0; bottom: 0;
+    left: calc(var(--gutter) - 1px);
+    width: 4px;
+    background: var(--red);
+    transform-origin: top center;
+    transform: scaleY(0);
+    animation: nb-progress linear both;
+    animation-timeline: scroll(root block);
+    pointer-events: none;
+  }
+}
+@keyframes nb-progress { to { transform: scaleY(1); } }
+
+/* ── 5：記錄列表 ── */
+.entry .margin-mark::after { /* 原子筆底線 */
+  content: '';
+  position: absolute; right: 0; bottom: -2px;
+  width: 4.2em; height: 2px; background: var(--pen);
+  transform: scaleX(0); transform-origin: right center;
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.entry:hover .margin-mark::after,
+.entry:focus-within .margin-mark::after { transform: scaleX(1); }
+
+/* 第一次出現：一列一列寫上去，總延遲上限約 0.7 秒
+   只裁切列裡的文字，動畫結束後不留下 clip-path（fill-mode: backwards） */
+.entries .entry:nth-child(2) { --d: 110ms; }
+.entries .entry:nth-child(3) { --d: 220ms; }
+.entries .entry:nth-child(4) { --d: 330ms; }
+.entries .entry:nth-child(5) { --d: 440ms; }
+.entries .entry:nth-child(6) { --d: 550ms; }
+.entries .entry:nth-child(n + 7) { --d: 660ms; }
+html.nb-play .entries .entry > :not(.margin-mark) {
+  animation: nb-row-in 800ms cubic-bezier(0.45, 0.05, 0.4, 1) calc(var(--d, 0ms) + 300ms) backwards;
+}
+html.nb-play .entries .entry > .margin-mark {
+  animation: nb-fade-in 500ms linear calc(var(--d, 0ms) + 300ms) backwards;
+}
+@keyframes nb-row-in { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes nb-fade-in { from { opacity: 0; } }
+
+/* ── 減少動態效果：關掉翻頁與開場動畫，保留狀態回饋 ── */
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  html.nb-play .hero-title s::after,
+  html.nb-play .hero-title s,
+  html.nb-play .hero-title ins,
+  html.nb-play .entries .entry > * { animation: none; }
+  .entry .margin-mark::after { transition: none; }
+}

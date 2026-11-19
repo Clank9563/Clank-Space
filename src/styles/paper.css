@@ -1,0 +1,107 @@
+/* ───────── 紙張感 ─────────
+   1. 紙纖維顆粒：程序產生的雜訊，疊在方格紙上
+   2. 撕線孔：頁首下方一排小孔，像計算紙本頂端可以撕下的那條
+   3. 便條：用膠帶貼上、稍微歪斜、浮在紙面上的紙片
+   4. 文章頁：一張放在本子上的紙，底下還疊著一張
+   5. 原子筆：斜放在右下角桌面上，翻頁時不動 */
+
+:root {
+  /* 雜訊用 SVG feTurbulence 產生，只有幾百位元組 */
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.16 0 0 0 0 0.13 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --paper-fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.09' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.10 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  --lift: 0 1px 1px rgba(31, 42, 34, 0.08), 0 6px 14px -6px rgba(31, 42, 34, 0.22), 0 18px 30px -18px rgba(31, 42, 34, 0.25);
+  --tape: rgba(250, 252, 246, 0.62);
+}
+:root[data-theme='dark'] {
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.85 0 0 0 0 0.92 0 0 0 0 0.86 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --lift: 0 1px 1px rgba(0, 0, 0, 0.3), 0 8px 18px -8px rgba(0, 0, 0, 0.55), 0 20px 34px -20px rgba(0, 0, 0, 0.6);
+  --tape: rgba(219, 230, 214, 0.16);
+  --paper-fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.09' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.03 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+}
+
+/* 1. 紙纖維：疊在頁面與本子的方格上 */
+body,
+.nb-body {
+  background-image:
+    var(--paper-grain),
+    var(--paper-fiber),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 220px 220px, 400px 400px, 24px 24px, 24px 24px;
+}
+.article,
+.note,
+.nb-header { background-image: var(--paper-grain); background-size: 220px 220px; }
+
+/* 2. 撕線孔：計算紙本頂端的撕線 */
+.nb-body::after {
+  content: '';
+  position: absolute; left: 0; right: 0; top: 10px; height: 6px;
+  background-image: radial-gradient(circle at 3px 3px, var(--hair) 1.6px, transparent 2.1px);
+  background-size: 14px 6px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* 3. 便條：膠帶貼上、微微歪斜、浮在紙面上 */
+.nb-aside .note {
+  position: relative;
+  box-shadow: var(--lift);
+  transform: rotate(-0.5deg);
+}
+.nb-aside .note:nth-child(2n) { transform: rotate(0.45deg); }
+.nb-aside .note:nth-child(3n) { transform: rotate(-0.25deg); }
+.nb-aside .note::before { /* 膠帶 */
+  content: '';
+  position: absolute; top: -11px; left: 50%;
+  width: 92px; height: 22px;
+  translate: -50% 0;
+  rotate: -3deg;
+  background: var(--tape);
+  border-left: 1px dashed rgba(31, 42, 34, 0.12);
+  border-right: 1px dashed rgba(31, 42, 34, 0.12);
+  box-shadow: 0 1px 2px rgba(31, 42, 34, 0.08);
+  backdrop-filter: blur(0.5px);
+}
+.nb-aside .note:nth-child(2n)::before { rotate: 4deg; left: 38%; }
+/* 目次便條要好讀，不歪斜也不貼膠帶 */
+.nb-aside .toc { transform: none; }
+.nb-aside .toc::before { display: none; }
+
+/* 4. 文章頁：一張放在本子上的紙，底下疊著另一張 */
+.article {
+  box-shadow: var(--lift);
+  isolation: isolate;
+}
+.article::before {
+  content: '';
+  position: absolute; inset: 0;
+  z-index: -1;
+  background: var(--sheet);
+  border: 1px solid var(--hair);
+  transform: translate(6px, 7px) rotate(0.6deg);
+  box-shadow: var(--lift);
+}
+
+/* 5. 原子筆 */
+.nb-pen {
+  position: fixed;
+  right: -40px; bottom: 150px;
+  width: 340px; height: auto;
+  rotate: 24deg; /* 筆尖朝左上、筆尾伸出畫面右下，像隨手放在本子旁邊 */
+  transform-origin: 0.86% 50%; /* 以筆尖為軸：寫字時移動、轉動都以筆尖為準 */
+  z-index: 5;
+  pointer-events: none;
+  filter: drop-shadow(8px 14px 7px rgba(31, 42, 34, 0.32)) drop-shadow(2px 3px 1.5px rgba(31, 42, 34, 0.25));
+  view-transition-name: nb-pen; /* 翻頁時留在桌面上不動 */
+  transition: translate 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+:root[data-theme='dark'] .nb-pen { filter: drop-shadow(8px 14px 8px rgba(0, 0, 0, 0.6)) drop-shadow(2px 3px 1.5px rgba(0, 0, 0, 0.5)); }
+::view-transition-group(nb-pen) { animation: none; z-index: 12; }
+::view-transition-old(nb-pen) { display: none; }
+::view-transition-new(nb-pen) { animation: none; }
+/* 頁面捲到底時，筆往右下退一點，不擋住簽名列 */
+html.nb-at-end .nb-pen { translate: 60px 40px; }
+@media (max-width: 1180px) { .nb-pen { width: 220px; right: -40px; bottom: 80px; } }
+@media (max-width: 720px) { .nb-pen { display: none; } }
+@media print { .nb-pen, .nb-body::after { display: none; } }

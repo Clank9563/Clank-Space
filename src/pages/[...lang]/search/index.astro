@@ -1,0 +1,42 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { langParams, t, url, type Lang } from '../../../i18n';
+
+export function getStaticPaths() { return langParams; }
+const { lang } = Astro.props as { lang: Lang };
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const lede = lang === 'zh' ? '搜尋所有文章、專案與單頁。只會搜尋目前語言的內容。' : 'Search every entry, project and page in this language.';
+---
+<Base lang={lang} title={t(lang, 'search')} description={lede} pageNo="p.070" section="search" altHref={url(lang === 'zh' ? 'en' : 'zh', 'search/')} wide>
+  <h1 class="page-title">{t(lang, 'search')}</h1>
+  <p class="page-lede">{lede}</p>
+  <link href={`${base}pagefind/pagefind-ui.css`} rel="stylesheet" />
+  <div class="search-wrap" style="max-width: 760px">
+    <div id="search" data-base={base} data-placeholder={t(lang, 'searchPlaceholder')}></div>
+    <p class="search-note" id="search-dev" hidden>{t(lang, 'searchDev')}</p>
+  </div>
+</Base>
+<script>
+  const box = document.getElementById('search')!;
+  const base = box.dataset.base!;
+  const s = document.createElement('script');
+  s.src = `${base}pagefind/pagefind-ui.js`;
+  s.onload = () => {
+    // @ts-expect-error Pagefind UI 由腳本注入
+    new PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+      resetStyles: false,
+      translations: { placeholder: box.dataset.placeholder },
+    });
+    const input = box.querySelector('input');
+    const q = new URLSearchParams(location.search).get('q');
+    if (input) {
+      if (q) { input.value = q; input.dispatchEvent(new Event('input')); }
+      input.focus();
+    }
+  };
+  s.onerror = () => { document.getElementById('search-dev')!.hidden = false; };
+  document.body.appendChild(s);
+</script>

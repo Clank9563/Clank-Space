@@ -1,0 +1,36 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { formatDate, langParams, t, url, type Lang } from '../../../i18n';
+import { entryLabel, getProjects } from '../../../lib/content';
+import { site } from '../../../site.config';
+
+export function getStaticPaths() { return langParams; }
+const { lang } = Astro.props as { lang: Lang };
+const projects = await getProjects(lang);
+const lede = lang === 'zh'
+  ? '做過的專案。每一件都寫下做了什麼、為什麼這樣做，以及我負責的部分。'
+  : 'Things I have built: what each one does, why it was built that way, and which part was mine.';
+---
+<Base lang={lang} title={t(lang, 'projects')} description={lede} pageNo="p.020" section="projects" altHref={url(lang === 'zh' ? 'en' : 'zh', 'projects/')}>
+  <h1 class="page-title">{t(lang, 'projects')}{site.placeholder && <span class="sample-tag">{t(lang, 'sample')}</span>}</h1>
+  <p class="page-lede">{lede}</p>
+  <div class="section-head"><h2>{projects.length} {lang === 'zh' ? '件' : 'projects'}</h2></div>
+  {projects.length === 0 ? <p class="empty">{t(lang, 'emptyList')}</p> : (
+    <ol class="entries" reversed>
+      {projects.map((p) => (
+        <li class="entry">
+          <span class="margin-mark">{entryLabel(p.no, 'P')}</span>
+          <h3><a href={url(lang, `projects/${p.slug}/`)}>{p.data.title}</a></h3>
+          <span class="entry-meta">{p.data.period}</span>
+          <p>{p.data.description}<br /><span>{p.data.stack.join(' · ')}</span></p>
+        </li>
+      ))}
+    </ol>
+  )}
+  <Fragment slot="aside">
+    <section class="note">
+      <h2>{lang === 'zh' ? '說明' : 'Note'}</h2>
+      <p>{lang === 'zh' ? '專案編號 P-### 依開始時間連號，中英文版本共用。' : 'Project numbers P-### follow start date and are shared across languages.'}</p>
+    </section>
+  </Fragment>
+</Base>

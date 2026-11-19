@@ -1,0 +1,85 @@
+---
+import Base from '../../layouts/Base.astro';
+import EntryList from '../../components/EntryList.astro';
+import { getEntry } from 'astro:content';
+import { formatDate, langParams, t, url, type Lang } from '../../i18n';
+import { getPosts, getProjects, lastRevised } from '../../lib/content';
+import { site } from '../../site.config';
+
+export function getStaticPaths() { return langParams; }
+const { lang } = Astro.props as { lang: Lang };
+
+const posts = await getPosts(lang);
+const projects = (await getProjects(lang)).slice(0, 3);
+const now = await getEntry('pages', `${lang}/now`);
+const nowFirst = now?.body?.split('\n').find((l) => l.trim() && !/^[#>|]/.test(l))?.replace(/^[-*]\s*/, '') ?? '';
+const latestRevision = posts.reduce<Date | undefined>((d, p) => {
+  const r = lastRevised(p);
+  return !d || r > d ? r : d;
+}, undefined);
+
+const copy = {
+  zh: {
+    title: ['做過的系統、修好的方法，', '和'],
+    struck: '沒做錯',
+    rest: '做錯的那幾次。',
+    lede: `我是${site.location.zh}的${site.role.zh}，寫後端、雲端與維運。這本筆記不擦掉任何東西：每篇文章都有日期和編號，修訂時劃掉舊的，再寫上新的。`,
+    read: '翻開文章',
+    about: '認識我',
+  },
+  en: {
+    title: ['Systems I built, how I fixed them,', 'and the times I got them'],
+    struck: 'right',
+    rest: 'wrong.',
+    lede: `I'm a ${site.role.en.toLowerCase()} in ${site.location.en}, working on backends, cloud and operations. This notebook never erases: every entry is dated and numbered, and revisions strike the old words through instead of deleting them.`,
+    read: 'Open the entries',
+    about: 'About me',
+  },
+}[lang];
+---
+<Base lang={lang} description={copy.lede} pageNo="p.001" section="home" altHref={url(lang === 'zh' ? 'en' : 'zh')} lastRevised={latestRevision}>
+  <p class="entry-date">
+    {latestRevision && <time datetime={latestRevision.toISOString()}>{formatDate(latestRevision, lang)}</time>}
+    {site.placeholder && <span class="sample-tag">{t(lang, 'sample')}</span>}
+  </p>
+  <h1 class="hero-title">
+    {copy.title[0]}<br />{copy.title[1]}{lang === 'en' && ' '}<s>{copy.struck}</s><ins>{lang === 'en' && ' '}<span class="nowrap">{copy.rest}</span></ins>
+  </h1>
+  <p class="hero-lede">{copy.lede}</p>
+  <div class="btn-row">
+    <a class="btn primary" href={url(lang, 'posts/')}>{copy.read}</a>
+    <a class="btn" href={url(lang, 'about/')}>{copy.about}</a>
+  </div>
+
+  <div class="section-head">
+    <h2>{t(lang, 'latest')}</h2>
+    <a href={url(lang, 'posts/')}>{t(lang, 'allEntries')} ({posts.length}) →</a>
+  </div>
+  <EntryList lang={lang} posts={posts.slice(0, 6)} showDesc />
+
+  <Fragment slot="aside">
+    {now && (
+      <section class="note">
+        <h2>{t(lang, 'now')}</h2>
+        <p>{nowFirst}</p>
+        <a class="more" href={url(lang, 'now/')}>{lang === 'zh' ? '看最近在做什麼' : 'What I’m doing now'} →</a>
+      </section>
+    )}
+    <section class="note">
+      <h2>{t(lang, 'projects')}</h2>
+      <ul>
+        {projects.map((p) => <li><a href={url(lang, `projects/${p.slug}/`)}>{p.data.title}</a></li>)}
+      </ul>
+      <a class="more" href={url(lang, 'projects/')}>{lang === 'zh' ? '全部專案' : 'All projects'} →</a>
+    </section>
+    <section class="note">
+      <h2>{t(lang, 'categories')}</h2>
+      <ul>
+        {Object.entries(site.categories).map(([key, label]) => {
+          const n = posts.filter((p) => p.data.category === key).length;
+          return n > 0 && <li><a href={url(lang, `categories/${key}/`)}>{label[lang]}</a> <span class="entry-meta">· {n}</span></li>;
+        })}
+      </ul>
+    </section>
+  </Fragment>
+</Base>

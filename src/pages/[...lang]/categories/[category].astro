@@ -1,0 +1,26 @@
+---
+import PostIndex from '../../../components/PostIndex.astro';
+import { langs, t, url, type Lang } from '../../../i18n';
+import { getPosts } from '../../../lib/content';
+import { site, type CategoryKey } from '../../../site.config';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of langs) {
+    const posts = await getPosts(lang);
+    for (const category of Object.keys(site.categories)) {
+      if (posts.some((p) => p.data.category === category)) {
+        paths.push({ params: { lang: lang === 'zh' ? undefined : 'en', category }, props: { lang } });
+      }
+    }
+  }
+  return paths;
+}
+const { lang } = Astro.props as { lang: Lang };
+const category = Astro.params.category as CategoryKey;
+const all = await getPosts(lang);
+const posts = all.filter((p) => p.data.category === category);
+const label = site.categories[category][lang];
+const lede = lang === 'zh' ? `${t(lang, 'filedUnder')}「${label}」的記錄。` : `Entries ${t(lang, 'filedUnder').toLowerCase()} ${label}.`;
+---
+<PostIndex lang={lang} title={label} lede={lede} posts={posts} allPosts={all} pageNo={`p.010 / ${category}`} currentCategory={category} altHref={url(lang === 'zh' ? 'en' : 'zh', `categories/${category}/`)} />

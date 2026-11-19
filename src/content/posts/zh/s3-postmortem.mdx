@@ -1,0 +1,44 @@
+---
+title: 一次 S3 權限設定錯誤的事後檢討
+description: 一個測試用的 bucket 被設成公開讀取，存在了三天才被發現。這篇按時間線記錄發生了什麼、為什麼沒被擋下來，以及之後改了哪些流程。
+date: 2026-10-18
+category: cloud
+tags: [AWS, S3, 事後檢討]
+translationKey: s3-postmortem
+---
+
+> 範例文章：這篇是網站範本附帶的示範內容，情境為虛構，請換成你自己的文章。
+
+事後檢討的目的不是找戰犯，而是找出讓錯誤能夠發生的那個流程缺口。這篇用時間線的方式記錄一次權限設定錯誤。
+
+## 時間線
+
+| 時間 | 事件 |
+| --- | --- |
+| 第 1 天 10:20 | 為了測試匯出功能，建立新的 bucket |
+| 第 1 天 10:35 | 為了讓前端能直接讀取，暫時關閉 Block Public Access |
+| 第 4 天 09:10 | 例行的權限掃描發出警告 |
+| 第 4 天 09:25 | 重新開啟 Block Public Access，確認沒有外部存取紀錄 |
+
+## 為什麼沒被擋下來
+
+<Sidenote label="註" note="帳號層級的設定會覆蓋所有 bucket，就算個別 bucket 關掉也沒用。這正是我們想要的行為。">帳號層級的 Block Public Access 沒有開啟，所以每個 bucket 都可以自己決定要不要公開。</Sidenote>
+
+權限掃描一天只跑一次，而且警告只寄到一個很少人看的信箱。
+
+## 改了什麼
+
+1. 在帳號層級開啟 Block Public Access。
+2. 需要公開的檔案一律透過 CloudFront 提供，不直接開放 bucket。
+3. 權限掃描的警告改送到團隊的值班頻道。
+
+```bash
+aws s3control put-public-access-block \
+  --account-id 123456789012 \
+  --public-access-block-configuration \
+  BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
+```
+
+## 學到的事
+
+「暫時」的設定最危險，因為沒有人會記得把它改回來。現在只要是暫時的例外，就必須在工單上寫明什麼時候恢復。

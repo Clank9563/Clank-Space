@@ -1,0 +1,29 @@
+---
+import { formatDate, t, url, type Lang } from '../i18n';
+import { entryLabel, lastRevised, readingMinutes, type NumberedPost } from '../lib/content';
+
+interface Props { lang: Lang; posts: NumberedPost[]; showDesc?: boolean }
+const { lang, posts, showDesc = false } = Astro.props;
+---
+{posts.length === 0 ? (
+  <p class="empty">{t(lang, 'emptyList')}</p>
+) : (
+  <ol class="entries" reversed>
+    {posts.map((p) => {
+      const revised = lastRevised(p);
+      const isRevised = revised > p.data.date;
+      return (
+        <li class:list={['entry', { 'is-outdated': p.data.outdated, 'is-draft': p.data.draft }]}>
+          <span class="margin-mark">{entryLabel(p.no)}</span>
+          <h3><a href={url(lang, `posts/${p.slug}/`)}>{p.data.title}</a></h3>
+          <span class="entry-meta">
+            <time datetime={p.data.date.toISOString()}>{formatDate(p.data.date, lang)}</time>
+            {isRevised && <> · <span class="revised-mark" title={`${t(lang, 'revised')} ${formatDate(revised, lang)}`}>{t(lang, 'revised')}</span></>}
+            {` · ${readingMinutes(p.body)} ${t(lang, 'minutes')}`}
+          </span>
+          {showDesc && <p>{p.data.description}</p>}
+        </li>
+      );
+    })}
+  </ol>
+)}

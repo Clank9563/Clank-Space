@@ -1,0 +1,51 @@
+---
+import { site } from '../site.config';
+import { t, url, type Lang, type Key } from '../i18n';
+
+interface Props { lang: Lang; pageNo: string; section?: string; altHref: string }
+const { lang, pageNo, section, altHref } = Astro.props;
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+
+const nav: { key: Key; path: string; section: string }[] = [
+  { key: 'writing', path: 'posts/', section: 'writing' },
+  { key: 'projects', path: 'projects/', section: 'projects' },
+  { key: 'about', path: 'about/', section: 'about' },
+  { key: 'now', path: 'now/', section: 'now' },
+  { key: 'uses', path: 'uses/', section: 'uses' },
+  { key: 'contact', path: 'contact/', section: 'contact' },
+];
+---
+<header class="nb-header">
+  <div class="nb-owner">
+    <span class="field-label">{t(lang, 'notebookOf')}</span>
+    <a href={url(lang)} aria-current={section === 'home' ? 'page' : undefined}>
+      {site.name[lang]}{lang === 'zh' && <small lang="en">{site.name.en}</small>}
+    </a>
+  </div>
+  <nav class="nb-nav" aria-label={t(lang, 'contents')}>
+    <span class="field-label">{t(lang, 'contents')}</span>
+    <ul>
+      {nav.map((item) => (
+        <li>
+          <a href={url(lang, item.path)} aria-current={section === item.section ? 'page' : undefined}>
+            {t(lang, item.key)}{lang === 'zh' && <small lang="en">{t('en', item.key)}</small>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <div class="nb-page">
+    <span class="field-label">{t(lang, 'bookPage')}</span>
+    <strong>{site.book} · {pageNo}</strong>
+  </div>
+  <div class="nb-tools">
+    <a class="tool" href={url(lang, 'search/')} aria-label={t(lang, 'search')} title={t(lang, 'search')}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+    </a>
+    <button class="tool" type="button" data-theme-toggle aria-label={t(lang, 'themeLabel')} title={t(lang, 'themeLabel')}>
+      <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+      <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+    </button>
+    <a class="tool" href={altHref} hreflang={other === 'zh' ? 'zh-Hant' : 'en'} lang={other === 'zh' ? 'zh-Hant' : 'en'} aria-label={t(lang, 'switchLangLabel')}>{t(lang, 'switchLang')}</a>
+  </div>
+</header>

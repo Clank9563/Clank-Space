@@ -1,0 +1,31 @@
+---
+import { t, type Lang } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<div hidden data-copy-labels data-copy={t(lang, 'copy')} data-copied={t(lang, 'copied')}></div>
+<script>
+  // 為每個程式碼區塊加上「複製」按鈕
+  const labels = document.querySelector<HTMLElement>('[data-copy-labels]')!.dataset;
+  document.querySelectorAll<HTMLPreElement>('.prose pre').forEach((pre) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'code-block';
+    pre.replaceWith(wrap);
+    wrap.appendChild(pre);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy-btn';
+    btn.textContent = labels.copy!;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.innerText.replace(/\n$/, ''));
+        btn.textContent = labels.copied!;
+        btn.dataset.state = 'done';
+        setTimeout(() => { btn.textContent = labels.copy!; delete btn.dataset.state; }, 1600);
+      } catch {
+        btn.textContent = '—';
+      }
+    });
+    wrap.appendChild(btn);
+  });
+</script>

@@ -1,0 +1,114 @@
+---
+// 右下角桌面上的原子筆：圈章節、劃修訂、寫標題的就是這支筆。純裝飾，不接收滑鼠事件。
+// 立體感來自：圓柱筆身的鏡面高光與邊緣反光、鍍鉻零件的銳利反光、接縫的陰影、圓頂筆尾的放射漸層。
+---
+<svg class="nb-pen" viewBox="0 0 420 48" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- 筆身：藍色塑膠圓柱，上方有一道窄而亮的鏡面高光，下緣有環境反光 -->
+    <linearGradient id="pen-barrel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#08143f" />
+      <stop offset="0.1" stop-color="#18307f" />
+      <stop offset="0.24" stop-color="#3f62dc" />
+      <stop offset="0.3" stop-color="#9fb4ff" />
+      <stop offset="0.33" stop-color="#e6ecff" />
+      <stop offset="0.37" stop-color="#7d97f5" />
+      <stop offset="0.52" stop-color="#2b4bbd" />
+      <stop offset="0.78" stop-color="#162b84" />
+      <stop offset="0.88" stop-color="#2f4cb4" />
+      <stop offset="0.95" stop-color="#14286f" />
+      <stop offset="1" stop-color="#070f33" />
+    </linearGradient>
+    <!-- 鍍鉻：高對比、窄高光、深色反射 -->
+    <linearGradient id="pen-chrome" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b4047" />
+      <stop offset="0.18" stop-color="#9aa1a9" />
+      <stop offset="0.3" stop-color="#ffffff" />
+      <stop offset="0.38" stop-color="#d6dbe0" />
+      <stop offset="0.55" stop-color="#6c737b" />
+      <stop offset="0.7" stop-color="#2f343a" />
+      <stop offset="0.86" stop-color="#8d949c" />
+      <stop offset="1" stop-color="#3a3f45" />
+    </linearGradient>
+    <!-- 筆尖金屬錐：沿長度從暗到亮 -->
+    <linearGradient id="pen-cone-len" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.35" />
+      <stop offset="0.6" stop-color="#000" stop-opacity="0" />
+      <stop offset="1" stop-color="#fff" stop-opacity="0.15" />
+    </linearGradient>
+    <!-- 橡膠握位：霧面，高光寬而柔 -->
+    <linearGradient id="pen-grip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#060a1c" />
+      <stop offset="0.25" stop-color="#1d2850" />
+      <stop offset="0.36" stop-color="#3a4774" />
+      <stop offset="0.55" stop-color="#18213f" />
+      <stop offset="0.85" stop-color="#0c132c" />
+      <stop offset="1" stop-color="#04081a" />
+    </linearGradient>
+    <pattern id="pen-ridges" width="5.2" height="48" patternUnits="userSpaceOnUse">
+      <rect width="2" height="48" fill="rgba(0,0,0,0.38)" />
+      <rect x="2" width="0.8" height="48" fill="rgba(255,255,255,0.10)" />
+    </pattern>
+    <!-- 筆尾圓頂 -->
+    <radialGradient id="pen-dome" cx="0.35" cy="0.3" r="0.9">
+      <stop offset="0" stop-color="#c5d2ff" />
+      <stop offset="0.18" stop-color="#4f6fe0" />
+      <stop offset="0.55" stop-color="#1c3392" />
+      <stop offset="1" stop-color="#060e36" />
+    </radialGradient>
+    <linearGradient id="pen-cap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#060e36" />
+      <stop offset="0.25" stop-color="#2a47b3" />
+      <stop offset="0.33" stop-color="#b9c8ff" />
+      <stop offset="0.4" stop-color="#3b5bd0" />
+      <stop offset="0.75" stop-color="#132672" />
+      <stop offset="1" stop-color="#050b2c" />
+    </linearGradient>
+  </defs>
+
+  <!-- 筆尖：金屬圓錐與滾珠 -->
+  <path d="M2.5 24 L35 15.2 L35 32.8 Z" fill="url(#pen-chrome)" />
+  <path d="M2.5 24 L35 15.2 L35 32.8 Z" fill="url(#pen-cone-len)" />
+  <circle cx="3.4" cy="24" r="1.9" fill="#15181c" />
+  <circle cx="3" cy="23.3" r="0.6" fill="#e9edf2" />
+  <!-- 筆尖定位點：pen-write.js 用它算出筆尖在畫面上的位置 -->
+  <circle class="pen-tip" cx="3.6" cy="24" r="0.6" fill="transparent" />
+  <rect x="35" y="13.6" width="9" height="20.8" rx="1.2" fill="url(#pen-chrome)" />
+  <rect x="43.2" y="13.6" width="0.9" height="20.8" fill="rgba(0,0,0,0.45)" />
+
+  <!-- 橡膠握位與凹槽 -->
+  <rect x="44" y="11.8" width="83" height="24.4" rx="3.5" fill="url(#pen-grip)" />
+  <rect x="48" y="11.8" width="75" height="24.4" fill="url(#pen-ridges)" />
+  <rect x="44" y="15" width="83" height="2.2" rx="1.1" fill="rgba(170,185,235,0.18)" />
+
+  <!-- 鍍鉻環（兩側有接縫陰影） -->
+  <rect x="126" y="10.6" width="1.2" height="26.8" fill="rgba(0,0,0,0.5)" />
+  <rect x="127.2" y="10.6" width="7.4" height="26.8" rx="0.8" fill="url(#pen-chrome)" />
+  <rect x="134.6" y="10.6" width="1.4" height="26.8" fill="rgba(0,0,0,0.42)" />
+
+  <!-- 筆身 -->
+  <rect x="136" y="11" width="220" height="26" fill="url(#pen-barrel)" />
+  <rect x="140" y="18.6" width="210" height="0.9" rx="0.45" fill="rgba(255,255,255,0.55)" />
+  <text x="250" y="31.2" font-family="'Schibsted Grotesk Variable', sans-serif" font-size="6.6" font-weight="600" letter-spacing="1.4" fill="rgba(225,232,255,0.6)">NOTEBOOK · 0.5 mm</text>
+
+  <!-- 筆夾下方的陰影 -->
+  <rect x="338" y="10.2" width="70" height="3.4" rx="1.7" fill="rgba(0,0,0,0.35)" />
+
+  <!-- 筆尾：圓柱段與圓頂 -->
+  <rect x="356" y="11" width="1.6" height="26" fill="rgba(0,0,0,0.45)" />
+  <rect x="357.6" y="11" width="36" height="26" fill="url(#pen-cap)" />
+  <path d="M393.6 11 A13 13 0 0 1 393.6 37 Z" fill="url(#pen-dome)" />
+
+  <!-- 筆夾：鍍鉻條、彎頭、末端圓珠 -->
+  <path d="M338 4.6 H404 Q409.5 4.6 409.5 10 V17.5 Q409.5 19.4 407.6 19.4 H405.8 Q404 19.4 404 17.5 V10.4 H340" fill="url(#pen-chrome)" />
+  <rect x="340" y="5.3" width="62" height="0.9" rx="0.45" fill="rgba(255,255,255,0.85)" />
+  <ellipse cx="341" cy="9.6" rx="4.2" ry="3.9" fill="url(#pen-chrome)" />
+  <circle cx="339.8" cy="8.4" r="1.1" fill="rgba(255,255,255,0.9)" />
+</svg>
+<script>
+  // 捲到頁底時讓筆退開一點，不擋住簽名列
+  const root = document.documentElement;
+  const check = () => root.classList.toggle('nb-at-end', innerHeight + scrollY >= document.documentElement.scrollHeight - 220);
+  addEventListener('scroll', check, { passive: true });
+  addEventListener('resize', check);
+  check();
+</script>

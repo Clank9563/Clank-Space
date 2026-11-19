@@ -1,0 +1,11 @@
+---
+// 旁註：在 .mdx 文章裡把「被說明的段落」包起來，註記內容放在 note 屬性：
+//   <Sidenote label="註" note="註記內容">被說明的段落文字</Sidenote>
+// 寬螢幕時註記掛在閱讀欄右側、和段落對齊；窄螢幕時接在段落下方
+interface Props { label?: string; note: string }
+const { label, note } = Astro.props;
+---
+<div class="sn-wrap">
+  <p><slot /></p>
+  <aside class="sidenote">{label && <b>{label}　</b>}{note}</aside>
+</div>

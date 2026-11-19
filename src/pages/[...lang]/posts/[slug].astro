@@ -1,0 +1,109 @@
+---
+import { render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import Toc from '../../../components/Toc.astro';
+import Giscus from '../../../components/Giscus.astro';
+import CopyCode from '../../../components/CopyCode.astro';
+import Sidenote from '../../../components/Sidenote.astro';
+import { formatDate, langs, t, url, type Lang } from '../../../i18n';
+import { entryLabel, findTranslation, getPosts, lastRevised, readingMinutes, tagSlug } from '../../../lib/content';
+import { site } from '../../../site.config';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of langs) {
+    const posts = await getPosts(lang);
+    posts.forEach((post, i) => {
+      paths.push({
+        params: { lang: lang === 'zh' ? undefined : 'en', slug: post.slug },
+        // 列表是新到舊：較新的是「下一篇」，較舊的是「上一篇」
+        props: { lang, post, newer: posts[i - 1], older: posts[i + 1] },
+      });
+    });
+  }
+  return paths;
+}
+
+const { lang, post, newer, older } = Astro.props as {
+  lang: Lang;
+  post: Awaited<ReturnType<typeof getPosts>>[number];
+  newer?: Awaited<ReturnType<typeof getPosts>>[number];
+  older?: Awaited<ReturnType<typeof getPosts>>[number];
+};
+const { Content, headings } = await render(post);
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+const translated = await findTranslation('posts', post.data.translationKey, other);
+const altHref = translated ? url(other, `posts/${translated}/`) : url(other, 'posts/');
+const revised = lastRevised(post);
+const minutes = readingMinutes(post.body);
+const no = entryLabel(post.no);
+const category = site.categories[post.data.category][lang];
+const revisions = [...post.data.revisions].sort((a, b) => b.date.valueOf() - a.date.valueOf());
+---
+<Base lang={lang} title={post.data.title} description={post.data.description} pageNo={no} section="writing" altHref={altHref} lastRevised={revised} type="article">
+  <article class:list={['article', { 'is-outdated': post.data.outdated }]}>
+    <header class="article-head">
+      <span class="margin-mark">{no}</span>
+      <h1 class="article-title">{post.data.title}</h1>
+      <p class="article-desc">{post.data.description}</p>
+      <dl class="record">
+        <div><dt class="field-label">{t(lang, 'firstWritten')}</dt><dd><time datetime={post.data.date.toISOString()}>{formatDate(post.data.date, lang)}</time></dd></div>
+        {revised > post.data.date && (
+          <div><dt class="field-label">{t(lang, 'revised')}</dt><dd><a href="#revisions" class="revised-mark">{formatDate(revised, lang)}</a></dd></div>
+        )}
+        <div><dt class="field-label">{t(lang, 'category')}</dt><dd><a href={url(lang, `categories/${post.data.category}/`)}>{category}</a></dd></div>
+        <div><dt class="field-label">{t(lang, 'readingTime')}</dt><dd>{`${minutes} ${t(lang, 'minutes')}`}</dd></div>
+        {site.goatcounter.code && (
+          <div><dt class="field-label">{t(lang, 'reads')}</dt><dd><span data-visits="PAGE" data-suffix={t(lang, 'timesSuffix')}>—</span></dd></div>
+        )}
+      </dl>
+      {post.data.outdated && <p class="callout">{t(lang, 'outdated')}</p>}
+      {!translated && <p class="visually-hidden">{t(lang, 'noTranslation')}</p>}
+      <Toc lang={lang} headings={headings} variant="inline" />
+    </header>
+
+    <div class="prose" data-pagefind-body>
+      <Content components={{ Sidenote }} />
+    </div>
+
+    {post.data.tags.length > 0 && (
+      <ul class="tags" style="margin-top: 36px" aria-label={t(lang, 'tags')}>
+        {post.data.tags.map((tag) => <li><a href={url(lang, `tags/${tagSlug(tag)}/`)}>{tag}</a></li>)}
+      </ul>
+    )}
+
+    {revisions.length > 0 && (
+      <section class="revisions" id="revisions" aria-labelledby="rev-title">
+        <h2 id="rev-title">{t(lang, 'revisions')}</h2>
+        <ol>
+          {revisions.map((r) => <li><time datetime={r.date.toISOString()}>{formatDate(r.date, lang)}</time><span>{r.note}</span></li>)}
+          <li><time datetime={post.data.date.toISOString()}>{formatDate(post.data.date, lang)}</time><span>{t(lang, 'firstWritten')}</span></li>
+        </ol>
+      </section>
+    )}
+
+    {(older || newer) && (
+      <nav class="pager" aria-label={lang === 'zh' ? '其他文章' : 'More entries'}>
+        {older ? (
+          <a class="prev" href={url(lang, `posts/${older.slug}/`)} rel="prev">
+            <span class="field-label">← {t(lang, 'prev')} · {entryLabel(older.no)}</span>
+            <strong>{older.data.title}</strong>
+          </a>
+        ) : <span />}
+        {newer && (
+          <a class="next" href={url(lang, `posts/${newer.slug}/`)} rel="next">
+            <span class="field-label">{t(lang, 'next')} · {entryLabel(newer.no)} →</span>
+            <strong>{newer.data.title}</strong>
+          </a>
+        )}
+      </nav>
+    )}
+
+    <Giscus lang={lang} />
+  </article>
+
+  <Fragment slot="aside">
+    <Toc lang={lang} headings={headings} />
+  </Fragment>
+  <CopyCode lang={lang} />
+</Base>

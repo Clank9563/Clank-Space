@@ -1,0 +1,45 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { langParams, t, url, type Lang } from '../../../i18n';
+import { site } from '../../../site.config';
+
+export function getStaticPaths() { return langParams; }
+const { lang } = Astro.props as { lang: Lang };
+const copy = {
+  zh: {
+    lede: '工作機會、合作、對文章的指正，都歡迎寫信給我。我通常會在幾天內回覆。',
+    email: '寫信',
+    elsewhere: '其他地方',
+    note: '對某篇文章有意見，直接在文章底下留言也可以，其他讀者也看得到。',
+  },
+  en: {
+    lede: 'Job opportunities, collaborations, or corrections to an entry: email is the best way to reach me. I usually reply within a few days.',
+    email: 'Email',
+    elsewhere: 'Elsewhere',
+    note: 'Comments on a specific entry can also go under the entry itself, where other readers can see them.',
+  },
+}[lang];
+---
+<Base lang={lang} title={t(lang, 'contact')} description={copy.lede} pageNo="p.060" section="contact" altHref={url(lang === 'zh' ? 'en' : 'zh', 'contact/')}>
+  <h1 class="page-title">{t(lang, 'contact')}</h1>
+  <p class="page-lede">{copy.lede}</p>
+  <div class="btn-row">
+    <a class="btn primary" href={`mailto:${site.email}`}>{copy.email}：{site.email}</a>
+  </div>
+  <div class="section-head"><h2>{copy.elsewhere}</h2></div>
+  <ul class="entries">
+    {site.socials.map((s) => (
+      <li class="entry">
+        <h3><a href={s.href} rel="me">{s.label} ↗</a></h3>
+        <span class="entry-meta">{s.href.replace(/^https?:\/\//, '')}</span>
+      </li>
+    ))}
+    <li class="entry">
+      <h3><a href={url(lang, 'rss.xml')}>{t(lang, 'rss')}</a></h3>
+      <span class="entry-meta">rss.xml</span>
+    </li>
+  </ul>
+  <Fragment slot="aside">
+    <section class="note"><h2>{t(lang, 'comments')}</h2><p>{copy.note}</p></section>
+  </Fragment>
+</Base>

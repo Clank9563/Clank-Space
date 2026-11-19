@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import { t, url } from '../i18n';
+const lang = 'zh' as const;
+---
+<Base lang={lang} title={t(lang, 'notFoundTitle')} description={t(lang, 'notFoundBody')} pageNo="p.404" altHref={url('en')} wide>
+  <h1 class="page-title">{t(lang, 'notFoundTitle')}</h1>
+  <p class="page-lede">{t(lang, 'notFoundBody')}</p>
+  <p class="page-lede" lang="en">{t('en', 'notFoundBody')}</p>
+  <div class="btn-row">
+    <a class="btn primary" href={url(lang)}>{t(lang, 'home')}</a>
+    <a class="btn" href={url(lang, 'search/')}>{t(lang, 'search')}</a>
+    <a class="btn" href={url('en')} lang="en">English</a>
+  </div>
+</Base>

@@ -1,0 +1,68 @@
+---
+import type { MarkdownHeading } from 'astro';
+import { t, type Lang } from '../i18n';
+interface Props {
+  lang: Lang;
+  headings: MarkdownHeading[];
+  /** note：寬螢幕右欄的便條；inline：窄螢幕放在文章開頭的可收合目次 */
+  variant?: 'note' | 'inline';
+}
+const { lang, headings, variant = 'note' } = Astro.props;
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+{items.length > 1 && (variant === 'note' ? (
+  <nav class="note toc" aria-label={t(lang, 'toc')}>
+    <h2>{t(lang, 'toc')}</h2>
+    <ol>
+      {items.map((h) => (
+        <li class={`depth-${h.depth}`}><a href={`#${h.slug}`} data-toc={h.slug}>{h.text}</a></li>
+      ))}
+    </ol>
+  </nav>
+) : (
+  <details class="note toc toc-inline">
+    <summary>{t(lang, 'toc')}</summary>
+    <nav aria-label={t(lang, 'toc')}><ol>
+      {items.map((h) => (
+        <li class={`depth-${h.depth}`}><a href={`#${h.slug}`} data-toc={h.slug}>{h.text}</a></li>
+      ))}
+    </ol></nav>
+  </details>
+))}
+<script>
+  // 簽名互動：讀到哪一節，邊欄的 § 號就被原子筆圈起來，目次同步標示
+  const heads = [...document.querySelectorAll<HTMLElement>('.prose h2[id]')];
+  const ring =
+    '<svg class="pen-ring" viewBox="0 0 100 50" preserveAspectRatio="none" aria-hidden="true">' +
+    '<path class="main" pathLength="1" d="M16 31 C 8 16, 38 5, 64 6 C 90 7, 97 25, 81 36 C 63 47, 24 47, 11 35 C 3 27, 12 13, 33 9"/>' +
+    '<path class="tail" pathLength="1" d="M33 9 C 44 7, 55 6.5, 63 8"/></svg>';
+  heads.forEach((h) => h.insertAdjacentHTML('beforeend', ring));
+  let current: HTMLElement | null = null;
+  const setCurrent = (h: HTMLElement | null) => {
+    if (h === current) return;
+    current?.classList.remove('is-current');
+    document.querySelectorAll<HTMLAnchorElement>('[data-toc]').forEach((a) => {
+      const on = h !== null && a.dataset.toc === h.id;
+      a.classList.toggle('is-current', on);
+      if (on) a.setAttribute('aria-current', 'location');
+      else a.removeAttribute('aria-current');
+    });
+    current = h;
+    h?.classList.add('is-current');
+  };
+  const update = () => {
+    const line = innerHeight * 0.3;
+    let hit: HTMLElement | null = null;
+    for (const h of heads) if (h.getBoundingClientRect().top <= line) hit = h;
+    setCurrent(hit);
+  };
+  if (heads.length) {
+    let ticking = false;
+    addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { update(); ticking = false; });
+    }, { passive: true });
+    update();
+  }
+</script>

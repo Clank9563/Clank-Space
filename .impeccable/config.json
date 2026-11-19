@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": [
+          "src/styles/global.css"
+        ],
+        "createdAt": "2026-11-18T08:01:02.923Z",
+        "reason": "Engineering-notebook world chosen by user on the decision page (round 3): the grid is the computation-pad material, frame-only; reading column is plain sheet"
+      },
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": [
+          "src/styles/paper.css"
+        ],
+        "createdAt": "2026-11-18T09:05:57.474Z",
+        "reason": "Same engineering-notebook grid exception as global.css (user-chosen world, round 3); paper.css re-declares the grid layer under the grain/fiber layers"
+      }
+    ]
+  }
+}

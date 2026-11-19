@@ -1,0 +1,52 @@
+---
+import { render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import Toc from '../../../components/Toc.astro';
+import CopyCode from '../../../components/CopyCode.astro';
+import Sidenote from '../../../components/Sidenote.astro';
+import { langs, t, url, type Lang } from '../../../i18n';
+import { entryLabel, findTranslation, getProjects } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of langs) {
+    for (const project of await getProjects(lang)) {
+      paths.push({ params: { lang: lang === 'zh' ? undefined : 'en', slug: project.slug }, props: { lang, project } });
+    }
+  }
+  return paths;
+}
+const { lang, project } = Astro.props as { lang: Lang; project: Awaited<ReturnType<typeof getProjects>>[number] };
+const { Content, headings } = await render(project);
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+const translated = await findTranslation('projects', project.data.translationKey, other);
+const no = entryLabel(project.no, 'P');
+---
+<Base lang={lang} title={project.data.title} description={project.data.description} pageNo={no} section="projects" altHref={translated ? url(other, `projects/${translated}/`) : url(other, 'projects/')} type="article">
+  <article class="article">
+    <header class="article-head">
+      <span class="margin-mark">{no}</span>
+      <h1 class="article-title">{project.data.title}</h1>
+      <p class="article-desc">{project.data.description}</p>
+      <dl class="record">
+        <div><dt class="field-label">{t(lang, 'period')}</dt><dd>{project.data.period}</dd></div>
+        <div><dt class="field-label">{t(lang, 'role')}</dt><dd>{project.data.role}</dd></div>
+        <div class="full"><dt class="field-label">{t(lang, 'stack')}</dt><dd>{project.data.stack.join(' · ')}</dd></div>
+      </dl>
+      {project.data.links.length > 0 && (
+        <div class="btn-row">
+          {project.data.links.map((l) => <a class="btn" href={l.href}>{l.label} ↗</a>)}
+        </div>
+      )}
+      <Toc lang={lang} headings={headings} variant="inline" />
+    </header>
+    <div class="prose" data-pagefind-body>
+      <Content components={{ Sidenote }} />
+    </div>
+  </article>
+  <Fragment slot="aside">
+    <Toc lang={lang} headings={headings} />
+    <a class="btn" href={url(lang, 'projects/')}>← {lang === 'zh' ? '全部專案' : 'All projects'}</a>
+  </Fragment>
+  <CopyCode lang={lang} />
+</Base>
