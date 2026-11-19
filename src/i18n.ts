@@ -27,7 +27,7 @@ const dict = {
   bookPage: { zh: '冊 / 頁', en: 'Book / Page' },
   settings: { zh: '設定', en: 'Settings' },
   home: { zh: '首頁', en: 'Home' },
-  writing: { zh: '文章', en: 'Writing' },
+  writing: { zh: '技術文章', en: 'Tech notes' },
   projects: { zh: '專案', en: 'Projects' },
   about: { zh: '關於', en: 'About' },
   now: { zh: '現在', en: 'Now' },
