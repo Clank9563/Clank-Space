@@ -8,8 +8,6 @@ stack: [Python, AWS Cost Explorer, PostgreSQL]
 translationKey: cost-dashboard
 ---
 
-> Sample project: demo content that ships with the site template. Replace it with your own.
-
 ## The problem
 
 We only learned which service overspent when the monthly bill arrived, too late to adjust.

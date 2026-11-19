@@ -22,7 +22,7 @@ export const langParams = () => [
 export const htmlLang: Record<Lang, string> = { zh: 'zh-Hant-TW', en: 'en' };
 
 const dict = {
-  notebookOf: { zh: '筆記本主人', en: 'Notebook of' },
+  notebookOf: { zh: '冊名', en: 'Notebook' },
   contents: { zh: '目次', en: 'Contents' },
   bookPage: { zh: '冊 / 頁', en: 'Book / Page' },
   settings: { zh: '設定', en: 'Settings' },
@@ -31,7 +31,8 @@ const dict = {
   projects: { zh: '專案', en: 'Projects' },
   about: { zh: '關於', en: 'About' },
   now: { zh: '現在', en: 'Now' },
-  uses: { zh: '工具', en: 'Uses' },
+  essays: { zh: '隨筆', en: 'Essays' },
+  topic: { zh: '主題', en: 'Topic' },
   contact: { zh: '聯絡', en: 'Contact' },
   search: { zh: '搜尋', en: 'Search' },
   switchLang: { zh: 'EN', en: '中文' },
@@ -55,6 +56,7 @@ const dict = {
   prev: { zh: '上一篇', en: 'Previous' },
   next: { zh: '下一篇', en: 'Next' },
   comments: { zh: '留言', en: 'Comments' },
+  outdatedLabel: { zh: '已過時', en: 'Outdated' },
   outdated: { zh: '這篇內容已經過時，保留作為紀錄。', en: 'This entry is outdated and kept for the record.' },
   noTranslation: { zh: '這篇文章只有中文版。', en: 'This entry is only available in English.' },
   copy: { zh: '複製', en: 'Copy' },

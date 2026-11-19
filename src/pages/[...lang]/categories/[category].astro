@@ -1,7 +1,7 @@
 ---
 import PostIndex from '../../../components/PostIndex.astro';
 import { langs, t, url, type Lang } from '../../../i18n';
-import { getPosts } from '../../../lib/content';
+import { getPosts, OUTDATED } from '../../../lib/content';
 import { site, type CategoryKey } from '../../../site.config';
 
 export async function getStaticPaths() {
@@ -13,14 +13,22 @@ export async function getStaticPaths() {
         paths.push({ params: { lang: lang === 'zh' ? undefined : 'en', category }, props: { lang } });
       }
     }
+    if (posts.some((p) => p.data.outdated)) {
+      paths.push({ params: { lang: lang === 'zh' ? undefined : 'en', category: OUTDATED }, props: { lang } });
+    }
   }
   return paths;
 }
 const { lang } = Astro.props as { lang: Lang };
-const category = Astro.params.category as CategoryKey;
+const category = Astro.params.category as CategoryKey | typeof OUTDATED;
 const all = await getPosts(lang);
-const posts = all.filter((p) => p.data.category === category);
-const label = site.categories[category][lang];
+const posts = category === OUTDATED ? all.filter((p) => p.data.outdated) : all.filter((p) => p.data.category === category);
+const label = category === OUTDATED ? t(lang, 'outdatedLabel') : site.categories[category][lang];
 const lede = lang === 'zh' ? `${t(lang, 'filedUnder')}「${label}」的記錄。` : `Entries ${t(lang, 'filedUnder').toLowerCase()} ${label}.`;
+// 另一個語言沒有這個分類的文章時，沒有對應的分類頁，語言切換改連到那邊的文章列表
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+const otherPosts = await getPosts(other);
+const otherHas = category === OUTDATED ? otherPosts.some((p) => p.data.outdated) : otherPosts.some((p) => p.data.category === category);
+const altHref = url(other, otherHas ? `categories/${category}/` : 'posts/');
 ---
-<PostIndex lang={lang} title={label} lede={lede} posts={posts} allPosts={all} pageNo={`p.010 / ${category}`} currentCategory={category} altHref={url(lang === 'zh' ? 'en' : 'zh', `categories/${category}/`)} />
+<PostIndex lang={lang} title={label} lede={lede} posts={posts} allPosts={all} pageNo={`p.010 / ${category}`} currentCategory={category} altHref={altHref} />

@@ -7,8 +7,6 @@ tags: [AWS, S3, Postmortem]
 translationKey: s3-postmortem
 ---
 
-> Sample entry: demo content with a fictional scenario. Replace it with your own writing.
-
 A postmortem is not about finding someone to blame. It is about finding the gap in the process that let the mistake happen.
 
 ## Timeline

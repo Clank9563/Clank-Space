@@ -11,8 +11,6 @@ links:
     href: https://github.com/your-account/deploy-platform
 ---
 
-> 範例專案：這是網站範本附帶的示範內容，請換成你自己的專案。
-
 ## 要解決的問題
 
 原本的部署靠一份很長的腳本，只有兩個人知道怎麼執行，出錯時也很難回復。

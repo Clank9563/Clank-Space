@@ -19,5 +19,3 @@ Moving the team's deploys to GitHub Actions, and tidying up this site.
 ## Life
 
 - Running three times a week, aiming for a first half marathon by year end
-
-> Sample content: replace with what you are actually doing. The idea comes from nownownow.com.

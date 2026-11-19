@@ -8,8 +8,6 @@ stack: [Python, AWS Cost Explorer, PostgreSQL]
 translationKey: cost-dashboard
 ---
 
-> 範例專案：這是網站範本附帶的示範內容，請換成你自己的專案。
-
 ## 要解決的問題
 
 月底收到帳單才知道哪個服務花太多錢，已經來不及調整。

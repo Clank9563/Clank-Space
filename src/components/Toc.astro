@@ -8,14 +8,21 @@ interface Props {
   variant?: 'note' | 'inline';
 }
 const { lang, headings, variant = 'note' } = Astro.props;
-const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+// 小標（h3）記下所屬的 h2，寬螢幕邊欄只展開目前正在讀的那一節
+let parent = '';
+const items = headings
+  .filter((h) => h.depth === 2 || h.depth === 3)
+  .map((h) => {
+    if (h.depth === 2) parent = h.slug;
+    return { ...h, parent: h.depth === 3 ? parent : h.slug };
+  });
 ---
 {items.length > 1 && (variant === 'note' ? (
   <nav class="note toc" aria-label={t(lang, 'toc')}>
     <h2>{t(lang, 'toc')}</h2>
     <ol>
       {items.map((h) => (
-        <li class={`depth-${h.depth}`}><a href={`#${h.slug}`} data-toc={h.slug}>{h.text}</a></li>
+        <li class={`depth-${h.depth}`} data-section={h.parent}><a href={`#${h.slug}`} data-toc={h.slug}>{h.text}</a></li>
       ))}
     </ol>
   </nav>
@@ -37,6 +44,10 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
     '<path class="main" pathLength="1" d="M16 31 C 8 16, 38 5, 64 6 C 90 7, 97 25, 81 36 C 63 47, 24 47, 11 35 C 3 27, 12 13, 33 9"/>' +
     '<path class="tail" pathLength="1" d="M33 9 C 44 7, 55 6.5, 63 8"/></svg>';
   heads.forEach((h) => h.insertAdjacentHTML('beforeend', ring));
+  // 邊欄目次：有 JS 時才收合其他節的小標，並讓目前位置保持在框內看得到
+  const sideToc = document.querySelector<HTMLElement>('.nb-aside .toc');
+  const sideList = sideToc?.querySelector<HTMLElement>('ol');
+  sideToc?.classList.add('is-collapsible');
   let current: HTMLElement | null = null;
   const setCurrent = (h: HTMLElement | null) => {
     if (h === current) return;
@@ -49,6 +60,15 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
     });
     current = h;
     h?.classList.add('is-current');
+    sideToc?.querySelectorAll<HTMLElement>('li[data-section]').forEach((li) => {
+      li.classList.toggle('is-open', h !== null && li.dataset.section === h.id);
+    });
+    const link = h && sideList?.querySelector<HTMLElement>(`[data-toc="${CSS.escape(h.id)}"]`);
+    if (sideList && link) {
+      const box = sideList.getBoundingClientRect();
+      const r = link.getBoundingClientRect();
+      if (r.top < box.top || r.bottom > box.bottom) sideList.scrollTop += r.top - box.top - box.height / 3;
+    }
   };
   const update = () => {
     const line = innerHeight * 0.3;

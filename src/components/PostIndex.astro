@@ -3,7 +3,7 @@
 import Base from '../layouts/Base.astro';
 import EntryList from './EntryList.astro';
 import { t, url, type Lang } from '../i18n';
-import { tagSlug, postsPagePath, type NumberedPost } from '../lib/content';
+import { tagSlug, postsPagePath, OUTDATED, type NumberedPost } from '../lib/content';
 import { site } from '../site.config';
 
 interface Props {
@@ -27,6 +27,7 @@ for (const p of allPosts) for (const tag of p.data.tags) {
   const k = tagSlug(tag);
   tagCounts.set(k, { label: tag, n: (tagCounts.get(k)?.n ?? 0) + 1 });
 }
+const outdatedCount = allPosts.filter((p) => p.data.outdated).length;
 const tags = [...tagCounts.entries()].sort((a, b) => b[1].n - a[1].n);
 ---
 <Base lang={lang} title={pager && pager.current > 1 ? `${title} · ${pageLabel}` : title} description={lede} pageNo={pageNo} section="writing" altHref={altHref}>
@@ -40,6 +41,9 @@ const tags = [...tagCounts.entries()].sort((a, b) => b[1].n - a[1].n);
         <li><a href={url(lang, `categories/${key}/`)} aria-current={currentCategory === key ? 'page' : undefined}>{label[lang]}<span>{n}</span></a></li>
       );
     })}
+    {outdatedCount > 0 && (
+      <li><a href={url(lang, `categories/${OUTDATED}/`)} aria-current={currentCategory === OUTDATED ? 'page' : undefined}>{t(lang, 'outdatedLabel')}<span>{outdatedCount}</span></a></li>
+    )}
   </ul>
   <div class="section-head"><h2>{pager ? allPosts.length : posts.length} {t(lang, 'entries')}{pager && pager.total > 1 && <span class="list-pager-where"> · {pageLabel}</span>}</h2><a href={url(lang, 'rss.xml')}>{t(lang, 'rss')}</a></div>
   <EntryList lang={lang} posts={posts} showDesc />

@@ -12,7 +12,8 @@ import { site } from '../../../site.config';
 export async function getStaticPaths() {
   const paths = [];
   for (const lang of langs) {
-    const posts = await getPosts(lang);
+    // 上一篇／下一篇依日期，不受「過時排最後」影響
+    const posts = (await getPosts(lang)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
     posts.forEach((post, i) => {
       paths.push({
         params: { lang: lang === 'zh' ? undefined : 'en', slug: post.slug },

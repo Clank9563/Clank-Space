@@ -11,7 +11,7 @@ const nav: { key: Key; path: string; section: string }[] = [
   { key: 'projects', path: 'projects/', section: 'projects' },
   { key: 'about', path: 'about/', section: 'about' },
   { key: 'now', path: 'now/', section: 'now' },
-  { key: 'uses', path: 'uses/', section: 'uses' },
+  { key: 'essays', path: 'essays/', section: 'essays' },
   { key: 'contact', path: 'contact/', section: 'contact' },
 ];
 ---
@@ -19,7 +19,7 @@ const nav: { key: Key; path: string; section: string }[] = [
   <div class="nb-owner">
     <span class="field-label">{t(lang, 'notebookOf')}</span>
     <a href={url(lang)} aria-current={section === 'home' ? 'page' : undefined}>
-      {site.name[lang]}{lang === 'zh' && <small lang="en">{site.name.en}</small>}
+      {site.title[lang]}{lang === 'zh' && <small lang="en">{site.titleSub}</small>}
     </a>
   </div>
   <nav class="nb-nav" aria-label={t(lang, 'contents')}>

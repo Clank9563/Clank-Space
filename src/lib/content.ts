@@ -33,9 +33,13 @@ export const entryLabel = (n: number, prefix = 'E') => `${prefix}-${String(n).pa
 export async function getPosts(lang: Lang) {
   const numbers = await entryNumbers();
   return (await getCollection('posts', ({ id, data }) => langOf(id) === lang && (import.meta.env.DEV || !data.draft)))
-    .sort(byDateDesc)
+    // 過時的文章排在最後，其餘依日期新到舊
+    .sort((a, b) => Number(a.data.outdated) - Number(b.data.outdated) || byDateDesc(a, b))
     .map((p) => ({ ...p, no: numbers.get(p.id)!, slug: slugOf(p.id) }));
 }
+
+/** 「已過時」不是真的分類，而是分類篩選列上的一個入口：/categories/outdated/ */
+export const OUTDATED = 'outdated';
 export type NumberedPost = Awaited<ReturnType<typeof getPosts>>[number];
 
 /** 文章列表每頁幾篇；第 1 頁在 /posts/，之後是 /posts/page/2/、/posts/page/3/… */
@@ -56,8 +60,23 @@ export async function getProjects(lang: Lang) {
     .map((p) => ({ ...p, no: keyNo.get(p.data.translationKey ?? p.id)!, slug: slugOf(p.id) }));
 }
 
+/** 隨筆：編號 S-### 依日期連號，中英文版本共用 */
+export async function getEssays(lang: Lang) {
+  const all = (await getCollection('essays', ({ data }) => import.meta.env.DEV || !data.draft))
+    .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+  const keyNo = new Map<string, number>();
+  for (const e of all) {
+    const key = e.data.translationKey ?? e.id;
+    if (!keyNo.has(key)) keyNo.set(key, keyNo.size + 1);
+  }
+  return all
+    .filter((e) => langOf(e.id) === lang)
+    .sort(byDateDesc)
+    .map((e) => ({ ...e, no: keyNo.get(e.data.translationKey ?? e.id)!, slug: slugOf(e.id) }));
+}
+
 /** 找另一個語言的對應版本 */
-export async function findTranslation(collection: 'posts' | 'projects', key: string | undefined, target: Lang) {
+export async function findTranslation(collection: 'posts' | 'projects' | 'essays', key: string | undefined, target: Lang) {
   if (!key) return undefined;
   const all = await getCollection(collection);
   const hit = all.find((e) => e.data.translationKey === key && langOf(e.id) === target);

@@ -10,8 +10,6 @@ revisions:
     note: Added the GitHub Actions deployment steps and the base path notes
 ---
 
-> Sample entry: this is demo content that ships with the site template. Replace it with your own writing.
-
 My old blog ran on a small virtual machine. I paid for it every month and had to remember to patch it. Yet it only ever did one thing: turn Markdown into HTML. This entry records how I made it static.
 
 ## Why Astro

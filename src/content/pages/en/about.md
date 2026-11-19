@@ -23,5 +23,3 @@ I'm a software engineer working on backend services, cloud architecture and oper
 ## This site
 
 Built with Astro and hosted on GitHub Pages. The layout borrows from an engineering computation notebook: every entry is numbered, and revisions never delete the old text.
-
-> Sample content: the experience above is placeholder text. Replace it with your own.

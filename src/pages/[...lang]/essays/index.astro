@@ -1,0 +1,38 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { formatDate, langParams, t, url, type Lang } from '../../../i18n';
+import { entryLabel, getEssays } from '../../../lib/content';
+
+export function getStaticPaths() { return langParams(); }
+const { lang } = Astro.props as { lang: Lang };
+const essays = await getEssays(lang);
+const lede = lang === 'zh'
+  ? '不只談技術。這裡記錄一些關於金融、哲學與生活的觀察，以及那些一時興起、值得留下的想法。'
+  : 'Beyond technology, this is a space for thoughts on finance, philosophy, life, and anything else that feels worth exploring or writing down.';
+---
+<Base lang={lang} title={t(lang, 'essays')} description={lede} pageNo="p.050" section="essays" altHref={url(lang === 'zh' ? 'en' : 'zh', 'essays/')}>
+  <h1 class="page-title">{t(lang, 'essays')}</h1>
+  <p class="page-lede">{lede}</p>
+  <div class="section-head"><h2>{essays.length} {t(lang, 'entries')}</h2></div>
+  {essays.length === 0 ? <p class="empty">{t(lang, 'emptyList')}</p> : (
+    <ol class="entries" reversed>
+      {essays.map((e) => (
+        <li class:list={['entry', { 'is-draft': e.data.draft }]}>
+          <span class="margin-mark">{entryLabel(e.no, 'S')}</span>
+          <h3><a href={url(lang, `essays/${e.slug}/`)}>{e.data.title}</a></h3>
+          <span class="entry-meta">
+            <time datetime={e.data.date.toISOString()}>{formatDate(e.data.date, lang)}</time>
+            {e.data.topic && ` · ${e.data.topic}`}
+          </span>
+          <p>{e.data.description}</p>
+        </li>
+      ))}
+    </ol>
+  )}
+  <Fragment slot="aside">
+    <section class="note">
+      <h2>{lang === 'zh' ? '說明' : 'Note'}</h2>
+      <p>{lang === 'zh' ? '隨筆編號 S-### 依日期連號，中英文版本共用。' : 'Essay numbers S-### follow date and are shared across languages.'}</p>
+    </section>
+  </Fragment>
+</Base>

@@ -1,0 +1,52 @@
+---
+import { render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import Toc from '../../../components/Toc.astro';
+import Giscus from '../../../components/Giscus.astro';
+import Sidenote from '../../../components/Sidenote.astro';
+import { formatDate, langs, t, url, type Lang } from '../../../i18n';
+import { entryLabel, findTranslation, getEssays, readingMinutes } from '../../../lib/content';
+import { site } from '../../../site.config';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of langs) {
+    for (const essay of await getEssays(lang)) {
+      paths.push({ params: { lang: lang === 'zh' ? undefined : 'en', slug: essay.slug }, props: { lang, essay } });
+    }
+  }
+  return paths;
+}
+const { lang, essay } = Astro.props as { lang: Lang; essay: Awaited<ReturnType<typeof getEssays>>[number] };
+const { Content, headings } = await render(essay);
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+const translated = await findTranslation('essays', essay.data.translationKey, other);
+const no = entryLabel(essay.no, 'S');
+---
+<Base lang={lang} title={essay.data.title} description={essay.data.description} pageNo={no} section="essays" altHref={translated ? url(other, `essays/${translated}/`) : url(other, 'essays/')} type="article">
+  <article class="article">
+    <header class="article-head">
+      <span class="margin-mark">{no}</span>
+      <h1 class="article-title">{essay.data.title}</h1>
+      <p class="article-desc">{essay.data.description}</p>
+      <dl class="record">
+        <div><dt class="field-label">{t(lang, 'firstWritten')}</dt><dd><time datetime={essay.data.date.toISOString()}>{formatDate(essay.data.date, lang)}</time></dd></div>
+        {essay.data.topic && <div><dt class="field-label">{t(lang, 'topic')}</dt><dd>{essay.data.topic}</dd></div>}
+        <div><dt class="field-label">{t(lang, 'readingTime')}</dt><dd>{`${readingMinutes(essay.body)} ${t(lang, 'minutes')}`}</dd></div>
+        {site.goatcounter.code && (
+          <div><dt class="field-label">{t(lang, 'reads')}</dt><dd><span data-visits="PAGE" data-suffix={t(lang, 'timesSuffix')}>—</span></dd></div>
+        )}
+      </dl>
+      {!translated && <p class="visually-hidden">{t(lang, 'noTranslation')}</p>}
+      <Toc lang={lang} headings={headings} variant="inline" />
+    </header>
+    <div class="prose" data-pagefind-body>
+      <Content components={{ Sidenote }} />
+    </div>
+    <Giscus lang={lang} />
+  </article>
+  <Fragment slot="aside">
+    <Toc lang={lang} headings={headings} />
+    <a class="btn" href={url(lang, 'essays/')}>← {lang === 'zh' ? '全部隨筆' : 'All essays'}</a>
+  </Fragment>
+</Base>

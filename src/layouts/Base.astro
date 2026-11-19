@@ -20,7 +20,7 @@ interface Props {
   /** 頁首「冊 / 頁」欄位顯示的頁碼 */
   pageNo: string;
   /** 目前所在的導覽區塊 */
-  section?: 'home' | 'writing' | 'projects' | 'about' | 'now' | 'uses' | 'contact' | 'search';
+  section?: 'home' | 'writing' | 'projects' | 'about' | 'now' | 'essays' | 'contact' | 'search';
   /** 另一個語言的對應網址 */
   altHref: string;
   /** 沒有便條欄的頁面 */
@@ -30,7 +30,9 @@ interface Props {
 }
 const { lang, title, description, pageNo, section, altHref, wide = false, lastRevised, type = 'website' } = Astro.props;
 const name = site.name[lang];
-const fullTitle = title ? `${title} · ${name}` : `${name} · ${site.role[lang]}`;
+const siteTitle = site.title[lang];
+// 首頁標題補上名字；網站名稱已經含名字時（例如英文版）改補職稱，避免重複
+const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} · ${siteTitle.includes(name) ? site.role[lang] : name}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const other: Lang = lang === 'zh' ? 'en' : 'zh';
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
@@ -44,7 +46,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang={htmlLang[other]} href={new URL(altHref, Astro.site)} />
-    <link rel="alternate" type="application/rss+xml" title={`${name} RSS`} href={url(lang, 'rss.xml')} />
+    <link rel="alternate" type="application/rss+xml" title={`${siteTitle} RSS`} href={url(lang, 'rss.xml')} />
     <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
     <link rel="sitemap" href={`${base}sitemap-index.xml`} />
     <meta property="og:type" content={type} />

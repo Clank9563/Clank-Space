@@ -2,7 +2,7 @@
 title: "How NAT traversal works: the principles and enterprise practice"
 description: How two machines behind NATs connect directly without a server in the middle. Firewall hole punching, STUN, hard NATs, relays, and ICE, and why enterprise firewalls and cloud NAT gateways are always the hardest layer.
 date: 2026-11-19
-category: notes
+category: network
 tags: [Networking, NAT, P2P, WireGuard]
 translationKey: nat-traversal
 ---

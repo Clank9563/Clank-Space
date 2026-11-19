@@ -65,7 +65,8 @@ body,
 }
 .nb-aside .note:nth-child(2n)::before { rotate: 4deg; left: 38%; }
 /* 目次便條要好讀，不歪斜也不貼膠帶 */
-.nb-aside .toc { transform: none; }
+/* 上面的 position: relative 會蓋掉目次的 sticky，這裡補回來讓目次跟著捲動 */
+.nb-aside .toc { transform: none; position: sticky; }
 .nb-aside .toc::before { display: none; }
 
 /* 4. 文章頁：一張放在本子上的紙，底下疊著另一張 */
@@ -82,6 +83,60 @@ body,
   /* 只位移不旋轉：旋轉的偏移量會隨文章長度放大，長文底部會歪出版面 */
   transform: translate(6px, 7px);
   box-shadow: var(--lift);
+}
+
+/* 4b. 大頭照：沖洗出來的相片，用膠帶貼在標題旁邊（關於頁） */
+.article-head.has-photo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr; /* 照片比標題高時，多出來的高度給簡介那一列，標題和簡介不會被拉開 */
+  column-gap: clamp(24px, 4vw, 48px);
+  align-items: start;
+}
+.article-head.has-photo > * { grid-column: 1; }
+.article-head.has-photo > .id-photo { grid-column: 2; grid-row: 1 / span 2; }
+.article-head.has-photo > .record,
+.article-head.has-photo > .toc-inline { grid-column: 1 / -1; }
+.id-photo {
+  position: relative;
+  width: 172px;
+  margin: 18px 6px 18px 0;
+  padding: 8px 8px 12px;
+  background: var(--sheet);
+  border: 1px solid var(--hair);
+  box-shadow: var(--lift);
+  rotate: 2deg;
+}
+.id-photo img,
+.id-photo > span {
+  display: block;
+  width: 100%; height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.id-photo::before { /* 膠帶，和便條同一種 */
+  content: '';
+  position: absolute; top: -10px; left: 50%;
+  width: 78px; height: 20px;
+  translate: -50% 0;
+  rotate: -4deg;
+  background: var(--tape);
+  border-left: 1px dashed rgba(31, 42, 34, 0.12);
+  border-right: 1px dashed rgba(31, 42, 34, 0.12);
+  box-shadow: 0 1px 2px rgba(31, 42, 34, 0.08);
+}
+/* 還沒放照片：虛線框的「照片黏貼處」 */
+.id-photo.is-empty { background: transparent; box-shadow: none; border: 0; padding: 0; rotate: 0deg; }
+.id-photo.is-empty::before { display: none; }
+.id-photo.is-empty > span {
+  display: grid; place-items: center;
+  border: 1.5px dashed var(--rule);
+  color: var(--ink-2);
+  font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+}
+@media (max-width: 720px) {
+  .article-head.has-photo { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .article-head.has-photo > .id-photo { grid-column: 1; grid-row: auto; width: 132px; margin: 12px 0 4px 4px; rotate: -1.5deg; }
 }
 
 /* 5. 原子筆 */

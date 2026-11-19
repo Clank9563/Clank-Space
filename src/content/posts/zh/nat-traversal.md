@@ -2,7 +2,7 @@
 title: NAT 穿透是如何工作的：技術原理與企業級實踐
 description: 兩台都在 NAT 後面的機器，怎麼不經過伺服器直接連上彼此：從防火牆打洞、STUN、困難 NAT、中繼到 ICE，以及企業防火牆和雲端 NAT 閘道為什麼總是最難穿的那一層。
 date: 2026-11-19
-category: notes
+category: network
 tags: [網路, NAT, P2P, WireGuard]
 translationKey: nat-traversal
 ---

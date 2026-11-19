@@ -106,9 +106,9 @@ a:hover { text-decoration-thickness: 2px; }
 }
 .nb-header > * { padding: 14px 20px; border-right: 1px solid var(--rule); min-width: 0; }
 .nb-header > *:last-child { border-right: 0; }
-.nb-owner a { color: var(--ink); text-decoration: none; display: block; margin-top: 6px; font-size: 20px; font-weight: 700; line-height: 1.25; }
+.nb-owner a { color: var(--ink); text-decoration: none; display: block; margin-top: 6px; font-size: 20px; font-weight: 700; line-height: 1.25; text-wrap: balance; }
 .nb-owner a:hover { text-decoration: underline; text-decoration-color: var(--pen); }
-.nb-owner small { font-size: 14px; font-weight: 500; color: var(--ink-2); margin-left: 6px; }
+.nb-owner small { display: block; font-size: 13px; font-weight: 500; letter-spacing: 0.04em; color: var(--ink-2); margin-top: 2px; }
 .nb-nav ul { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 22px; }
 .nb-nav a { color: var(--ink); text-decoration: none; font-size: 16px; font-weight: 500; white-space: nowrap; }
 .nb-nav a small { font-size: 12.5px; color: var(--ink-2); margin-left: 4px; font-weight: 500; }
@@ -428,6 +428,10 @@ ins { text-decoration: none; }
 .toc a:hover { color: var(--pen); }
 .toc a.is-current { color: var(--pen); font-weight: 600; }
 .toc a.is-current::before { color: var(--pen); }
+/* 邊欄目次最多一個螢幕高，太長時清單在框內捲動；小標只展開目前這一節 */
+.nb-aside .toc { max-height: calc(100vh - 40px); display: flex; flex-direction: column; }
+.nb-aside .toc ol { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.nb-aside .toc.is-collapsible li.depth-3:not(.is-open) { display: none; }
 
 /* 留言 */
 .comments { margin-top: 40px; border-top: 2px solid var(--rule); padding-top: 10px; }
@@ -526,7 +530,7 @@ ins { text-decoration: none; }
   .pager { grid-template-columns: 1fr; }
   .pager .next { border-left: 0; border-top: 1px solid var(--rule); padding-left: 0; text-align: left; }
   .revisions li { grid-template-columns: 1fr; gap: 0; }
-  .nb-owner a { font-size: 18px; }
+  .nb-owner a { font-size: 16.5px; text-wrap: balance; }
 }
 
 @media (prefers-reduced-motion: reduce) {

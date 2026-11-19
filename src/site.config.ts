@@ -1,7 +1,11 @@
 // 網站的個人資料都集中在這裡。目前全部是範例內容，請換成你自己的。
 export const site = {
   /** 還在用範例內容時設成 true，頁面會顯示「範例內容」標記；換成真實資料後改成 false */
-  placeholder: true,
+  placeholder: false,
+  /** 網站名稱：頁首左上角「冊名」、瀏覽器分頁標題、RSS 名稱 */
+  title: { zh: "Clank 的工程筆記", en: "Clank's Engineering Notebook" },
+  /** 中文版冊名下方的英文小字 */
+  titleSub: "Engineering Notebook",
   name: { zh: "胡惟傑", en: "Clank" },
   role: { zh: "軟體工程師", en: "Software Engineer" },
   location: { zh: "台中", en: "Taichung" },
@@ -36,7 +40,11 @@ export const site = {
     cloud: { zh: "雲端", en: "Cloud" },
     backend: { zh: "後端", en: "Backend" },
     frontend: { zh: "前端", en: "Frontend" },
-    notes: { zh: "隨筆", en: "Notes" },
+    network: { zh: "網路", en: "Networking" },
+    devops: { zh: "DevOps", en: "DevOps" },
+    database: { zh: "資料庫", en: "Database" },
+    security: { zh: "資安", en: "Security" },
+    ai: { zh: "AI", en: "AI" },
   },
 } as const;
 

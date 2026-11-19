@@ -11,8 +11,6 @@ links:
     href: https://github.com/your-account/deploy-platform
 ---
 
-> Sample project: demo content that ships with the site template. Replace it with your own.
-
 ## The problem
 
 Deploys depended on a long script only two people knew how to run, and failures were hard to roll back.

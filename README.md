@@ -26,6 +26,25 @@ npm run preview    # 預覽建置結果（站內搜尋只在這裡能用）
 | 關於、現在、工具 | `src/content/pages/zh/*.md`、`src/content/pages/en/*.md` |
 | 範例文章與專案 | `src/content/posts/`、`src/content/projects/`（直接刪除範例檔） |
 
+### 放大頭照
+
+「關於我」頁的標題旁邊可以放一張大頭照，會像沖洗出來的相片一樣用膠帶貼在紙上。
+
+1. 把照片放到 `src/content/pages/`，例如 `src/content/pages/photo.jpg`。直式（4:5）最好，其他比例會從中間裁切。
+2. 在中英文兩個 `about.md` 的開頭加上 `photo`，路徑是相對於 `.md` 檔：
+
+```markdown
+---
+title: 關於我
+description: …
+updated: 2026-11-01
+photo: ../photo.jpg
+photoAlt: 胡惟傑的大頭照
+---
+```
+
+`photoAlt` 是照片的文字描述，給螢幕閱讀器用，可以省略。照片建置時會自動壓縮成 WebP，直接放原圖就好；但原圖會存進 repo，建議先縮到長邊 1000px 左右。還沒放照片時，關於頁會顯示虛線的「照片黏貼處」；`placeholder` 改成 `false` 後，沒放照片就不顯示。
+
 ## 寫一篇文章
 
 在 `src/content/posts/zh/`（或 `en/`）新增一個 `.md` 檔，檔名就是網址：
