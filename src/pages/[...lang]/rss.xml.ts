@@ -11,7 +11,7 @@ export async function GET(context: APIContext) {
   const posts = await getPosts(lang);
   return rss({
     title: site.title[lang],
-    description: lang === 'zh' ? `${site.name.zh}的工作筆記` : `Working notes by ${site.name.en}`,
+    description: lang === 'zh' ? `${site.name.zh} 的工作筆記` : `Working notes by ${site.name.en}`,
     site: context.site!,
     items: posts.map((p) => ({
       title: p.data.title,
