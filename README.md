@@ -39,7 +39,7 @@ title: 關於我
 description: …
 updated: 2026-11-01
 photo: ../photo.jpg
-photoAlt: 胡惟傑的大頭照
+photoAlt: Clank 的大頭照
 ---
 ```
 

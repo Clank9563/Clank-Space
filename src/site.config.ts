@@ -6,7 +6,7 @@ export const site = {
   title: { zh: "Clank 的工程筆記", en: "Clank's Engineering Notebook" },
   /** 中文版冊名下方的英文小字 */
   titleSub: "Engineering Notebook",
-  name: { zh: "胡惟傑", en: "Clank" },
+  name: { zh: "Clank", en: "Clank" },
   role: { zh: "軟體工程師", en: "Software Engineer" },
   location: { zh: "台中", en: "Taichung" },
   /** 筆記本冊號，出現在頁首「Book / Page」欄位 */
