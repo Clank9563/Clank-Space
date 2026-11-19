@@ -20,18 +20,20 @@ const latestRevision = posts.reduce<Date | undefined>((d, p) => {
 
 const copy = {
   zh: {
-    title: ['做過的系統、修好的方法，', '和'],
-    struck: '沒做錯',
-    rest: '做錯的那幾次。',
-    lede: `我是${site.location.zh}的${site.role.zh}，寫後端、雲端與維運。這本筆記不擦掉任何東西：每篇文章都有日期和編號，修訂時劃掉舊的，再寫上新的。`,
+    before: '有些專案',
+    struck: '順利完賽',
+    rest: '中途退賽，',
+    after: '這裡記下每一次為什麼。',
+    lede: `我是 ${site.name.zh}，擔任${site.role.zh}。踩過的坑、繞過的路，最後怎麼解決的，都寫在這裡。`,
     read: '翻開文章',
     about: '認識我',
   },
   en: {
-    title: ['Systems I built, how I fixed them,', 'and the times I got them'],
-    struck: 'right',
-    rest: 'wrong.',
-    lede: `I'm a ${site.role.en.toLowerCase()} in ${site.location.en}, working on backends, cloud and operations. This notebook never erases: every entry is dated and numbered, and revisions strike the old words through instead of deleting them.`,
+    before: 'Some projects',
+    struck: 'made it',
+    rest: "didn't finish.",
+    after: "Here's why, every time.",
+    lede: `I'm ${site.name.en}, a ${site.role.en.toLowerCase()}. The pitfalls, the detours, and how things finally got solved are all written down here.`,
     read: 'Open the entries',
     about: 'About me',
   },
@@ -43,7 +45,7 @@ const copy = {
     {site.placeholder && <span class="sample-tag">{t(lang, 'sample')}</span>}
   </p>
   <h1 class="hero-title">
-    {copy.title[0]}<br />{copy.title[1]}{lang === 'en' && ' '}<s>{copy.struck}</s><ins>{lang === 'en' && ' '}<span class="nowrap">{copy.rest}</span></ins>
+    {copy.before}{lang === 'en' && ' '}<s>{copy.struck}</s><ins>{lang === 'en' && ' '}<span class="nowrap">{copy.rest}</span></ins><br />{copy.after}
   </h1>
   <p class="hero-lede">{copy.lede}</p>
   <div class="btn-row">
