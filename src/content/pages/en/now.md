@@ -1,21 +1,24 @@
 ---
 title: Now
-description: What I'm working on and learning at the moment. Updated roughly once a month.
+description: What I'm working on and learning lately. Updated roughly once a month.
 updated: 2026-11-01
 ---
 
-Moving the team's deploys to GitHub Actions, and tidying up this site.
-
 ## Work
 
-- Moving deploys from a hand-run script to GitHub Actions
-- Writing a postmortem template for the team
+- Continuing to work on YOLO image recognition projects, studying how the models are applied and how well they detect.
+- Exploring AI technologies and trying to bring AI into real projects.
+- Handling problems that come up during development, from debugging and analysis to finding the right solution.
 
 ## Learning
 
-- Reading the second edition of *Designing Data-Intensive Applications*
-- Writing small tools in Go
+- Kubernetes (K8s): from the basic architecture and container orchestration to real deployment and operations.
+- AWS: getting more familiar with cloud services, system architecture and deployment workflows.
+- Grafana: learning monitoring dashboards, metric visualisation and system observability.
+- DevOps: going deeper into containerised deployment, automation and system monitoring.
+- English: keeping up my listening, speaking, reading and writing, working toward a TOEIC score of 900.
 
 ## Life
 
-- Running three times a week, aiming for a first half marathon by year end
+- Keeping on with losing weight and building healthier habits.
+- Getting a little better every day, and keeping a steady rhythm of learning and growing.
